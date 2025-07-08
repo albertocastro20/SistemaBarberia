@@ -610,6 +610,8 @@ class BarberiaPrincipal(tk.Frame):
         self.crearFramesSeccion()
         
     def iniciarFrames(self):
+        #vamos a cambiar la interfaz gráfica
+        
         self.frameTitulo = Frame(self.parent, width=850, height=100, bg="black")
         self.frameTitulo.grid(row=0, column=0, padx=25, pady=10, columnspan=2)
         self.frameTitulo.grid_propagate(False)
