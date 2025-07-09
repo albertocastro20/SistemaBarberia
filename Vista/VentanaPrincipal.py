@@ -17,7 +17,7 @@ import datetime
 class CitasFrame(tk.Frame):
     #Iniciador del Frame
     def __init__(self, parent, controlador):
-        super().__init__(parent)
+        super().__init__(parent, bg= "#2C2525")
         self.controlador = controlador
         self.iniciarFramesCitas()
         self.iniciarWidgetsCitas()
@@ -25,24 +25,45 @@ class CitasFrame(tk.Frame):
 
     def iniciarFramesCitas(self):
         #Se iniciia el Frame en el que irán los otros dos Frames
-        self.frameCitaP = Frame(self, width=650, height=460, bg="black")
-        self.frameCitaP.grid(row=0, column=0)
-        self.frameCitaP.grid_propagate(False)
         
-        self.frameCitaI = Frame(self.frameCitaP, width=370, height=440, bg="white")
+        self.frameCitaI = Frame(self, width=370, height=440, bg="#333333", # Gris oscuro para el fondo del calendario/tabla
+                                relief="flat", bd=0, highlightbackground="#555555", highlightthickness=1)
+       
+        #self.frameCitaI = Frame(self, width=370, height=440, bg="white")
         self.frameCitaI.grid(row=0, column=0, padx=7, pady=10)
         self.frameCitaI.grid_propagate(False) #Evita que no muestre el tamaño original
 
-        self.frameCitaD = Frame(self.frameCitaP, width=250, height= 440, bg="white")
+        self.frameCitaD = Frame(self, width=259, height=440, bg="#333333", # Gris oscuro para el formulario de detalles
+                                relief="flat", bd=0, highlightbackground="#555555", highlightthickness=1)
+        
+        #self.frameCitaD = Frame(self, width=250, height= 440, bg="white")
         self.frameCitaD.grid(column=1, row=0, padx=7, pady=10)
         self.frameCitaD.grid_propagate(False)
 
     def iniciarWidgetsCitas(self):
         #Se crea una variable en el cual irá almacenado el día almacenado
         self.diaSeleccionado= ""
+
+        # Estilo para el calendario
+        cal_style = {
+            "selectbackground": "#4A90E2", # Azul para la fecha seleccionada
+            "selectforeground": "white",
+            "background": "#EB43C1", # Fondo del calendario
+            "foreground": "#000000", # Texto de los días
+            "headersbackground": "#4B2A4A", # Fondo de los encabezados (mes/año)
+            "headersforeground": "white",
+            "normalbackground": "#000000",
+            "normalforeground": "#E0E0E0",
+            "othermonthforeground": "#FFFFFF", # Días de otros meses más tenues
+            "othermonthbackground": "#011847",
+            "bordercolor": "#555555",
+            "weekendbackground": "#410658",
+            "weekendforeground": "#FFFFFF",
+            "font": ("Arial", 14)
+        }
         
-        self.calendarioCitas = Calendar(self.frameCitaI, showweeknumbers = False, showothermonthdays = False, background= "black")
-        self.calendarioCitas.config(font = ("Arial", 14)) #Se le da tamaño al calendario
+        self.calendarioCitas = Calendar(self.frameCitaI, showweeknumbers = False, **cal_style)
+        #self.calendarioCitas.config(font = ("Roboto", 14)) #Se le da tamaño al calendario
         self.calendarioCitas.grid(row = 0, column=0, padx = 10, pady = 10, columnspan = 2) #Columnspan para asignarle cuanos espacios ocupará
         self.calendarioCitas.bind("<<CalendarSelected>>", self.fechaSeleccionada) #Se le asigna un evento al calendario
 
@@ -50,15 +71,51 @@ class CitasFrame(tk.Frame):
         
         #Se selecciona la fecha actual, por lo que se mostrarán las citas del día
         self.diaSeleccionado = self.calendarioCitas.selection_get() #Se le asigna la fecha
-        self.etiquetaGestionT = Label(self.frameCitaI, text=f"Citas del dia: {self.diaSeleccionado.strftime('%d / %m/ %Y')}", anchor="w")
+        self.etiquetaGestionT = Label(self.frameCitaI, text=f"Citas del dia: {self.diaSeleccionado.strftime('%d / %m/ %Y')}", anchor="w", bg="#333333", fg="#E0E0E0", font=("Roboto", 11, "bold"))
         self.etiquetaGestionT.grid(row=1, column=0, pady=5)
 
-        self.botonMostrarCitas = Button(self.frameCitaI, text="Mostrar", command=lambda: self.mostrarCitas())
+         # Botón Mostrar Citas con estilo oscuro
+        button_style = {
+            "bg": "#4A90E2",  # Azul vibrante
+            "fg": "white",    # Texto blanco
+            "font": ("Segoe UI", 9, "bold"),
+            "bd": 0,
+            "relief": "flat",
+            "cursor": "hand2",
+            "activebackground": "#357ABD",
+            "activeforeground": "white",
+            "padx": 15,
+            "pady": 5
+        }
+
+        self.botonMostrarCitas = Button(self.frameCitaI, text="Mostrar", command=lambda: self.mostrarCitas(), **button_style)
         self.botonMostrarCitas.grid(row=1, column=1, pady=5)
 
+        # Tabla de Citas
+        style = ttk.Style()
+        style.theme_use("clam") # Tema moderno
+        style.configure("Treeview", 
+                        background="#444444", # Fondo oscuro de la tabla
+                        foreground="#E0E0E0", # Texto claro
+                        rowheight=20, # Altura de fila
+                        fieldbackground="#444444",
+                        font=("Segoe UI", 9))
+        style.map("Treeview", 
+                  background=[('selected', '#2980B9')]) # Azul brillante para selección
+
+        style.configure("Treeview.Heading", 
+                        font=("Segoe UI", 10, "bold"), 
+                        background="#2C3E50", # Encabezados oscuros
+                        foreground="white",
+                        relief="flat")
+        style.map("Treeview.Heading", 
+                  background=[('active', '#34495E')]) # Color al pasar el ratón por encabezados
+
+
+
         columnasTabla = ("Hora", "Cliente", "Barbero") #Tupla con los nombres de las columnas, la primera es con #0
-        self.tablaCitas = ttk.Treeview(self.frameCitaI, columns= columnasTabla, height=6, show="tree headings") #Constructor de la tabla
-        self.tablaCitas.grid(row=2, column=0, padx=10, pady=5, columnspan=2)
+        self.tablaCitas = ttk.Treeview(self.frameCitaI, columns= columnasTabla, height=5, show="tree headings") #Constructor de la tabla
+        self.tablaCitas.grid(row=2, column=0, padx=10, pady=8, columnspan=2)
 
         #se le asigna el ancho a cada columna
         self.tablaCitas.column("#0", width=50)
@@ -75,23 +132,50 @@ class CitasFrame(tk.Frame):
         self.tablaCitas.bind('<<TreeviewSelect>>', self.seleccionadorCita) #Se le asigna un evento al seleccionar una fila
         
         #Detalles de la cita
-        etiquetaIzquierda = Label(self.frameCitaD, text="Detalles de la cita", font=("Arial", 15))
-        etiquetaIzquierda.grid(row=0, column=0, padx=35, columnspan=3, pady=15)
+        etiquetaIzquierda = Label(self.frameCitaD, text="Detalles de la cita",  font=("Roboto", 15, "bold"), bg="#333333", fg="#E0E0E0")
+        etiquetaIzquierda.grid(row=0, column=0, padx=30, columnspan=3, pady=15)
         
+        # Estilo para Labels y Entrys en el formulario oscuro
+        label_style = {"bg": "#333333", "fg": "#E0E0E0", "font": ("Segoe UI", 9, "bold")}
+        entry_style = {"bg": "#444444", "fg": "#E0E0E0", "bd": 1, "relief": "solid", 
+                       "font": ("Segoe UI", 8), "insertbackground": "white", # Cursor blanco
+                       "highlightbackground": "#555555", "highlightcolor": "#4A90E2", "highlightthickness": 1}
+        
+        style.configure("TCombobox", 
+                        fieldbackground="#444444", # Fondo del campo de entrada
+                        foreground="#E0E0E0",     # Texto del campo de entrada
+                        background="#333333",     # Fondo de los botones del combobox
+                        selectbackground="#566679",# Fondo al seleccionar en el desplegable
+                        selectforeground="white",  # Texto al seleccionar en el desplegable
+                        bordercolor="#555555",
+                        lightcolor="#555555",
+                        darkcolor="#333333",
+                        arrowcolor="#E0E0E0",     # Color de la flecha
+                        font=("Segoe UI", 9))
+        # Mapeo para los estados del Combobox
+        style.map('TCombobox', 
+                  fieldbackground=[('readonly', '#444444'), ('focus', '#4A90E2')],
+                  foreground=[('readonly', '#E0E0E0')],
+                  selectbackground=[('readonly', '#4A90E2')],
+                  selectforeground=[('readonly', '#FFFFFF')],
+                  background=[('readonly', '#333333')],
+                  arrowcolor=[('!disabled', '#E0E0E0')],
+                  bordercolor=[('focus', '#4A90E2')])
 
-        etiquetaCliente = Label(self.frameCitaD, text="Cliente(id): ", font=("Arial", 13))
+        x = 0
+        etiquetaCliente = Label(self.frameCitaD, text="Cliente(id): ",  **label_style)
         etiquetaCliente.grid(row=1, column=0, pady=5, sticky="w")
-        self.campoCliente = Entry(self.frameCitaD)
-        self.campoCliente.grid(row=1, column=2)
+        self.campoCliente = Entry(self.frameCitaD, **entry_style)
+        self.campoCliente.grid(row=1, column=1, padx=(0, x), columnspan=2, sticky="w")
 
-        etiquetaBarbero = Label(self.frameCitaD, text="Barbero (id): ", font=("Arial", 13))
+        etiquetaBarbero = Label(self.frameCitaD, text="Barbero (id): ", **label_style)
         etiquetaBarbero.grid(row=2, column=0, pady=5, sticky="w")
-        self.campoBarbero = Entry(self.frameCitaD)
-        self.campoBarbero.grid(row=2, column=2)
+        self.campoBarbero = Entry(self.frameCitaD, **entry_style)
+        self.campoBarbero.grid(row=2, column=1, padx=(0, x), columnspan=2, sticky="w")
 
         #Cambiar por comboBox
 
-        etiquetaHora  = Label(self.frameCitaD, text="Hora: ", font=("Arial", 13))
+        etiquetaHora  = Label(self.frameCitaD, text="Hora: ",  **label_style)
         etiquetaHora.grid(row=3, column=0, pady=5, sticky="w")
 
         self.listaHoras = list()
@@ -106,30 +190,45 @@ class CitasFrame(tk.Frame):
                 
                 self.listaHoras.append(horaMinutos)
 
-        self.comboHora = ttk.Combobox(self.frameCitaD, state="readonly", values=self.listaHoras)
-        self.comboHora.grid(row=3, column=2)
+        self.comboHora = ttk.Combobox(self.frameCitaD, state="readonly", values=self.listaHoras, width=18)
+        self.comboHora.grid(row=3, column=1, padx=(0, x), columnspan=2, sticky="w")
 
         self.listaEstatus = ["Activo", "Pendiente", "Cancelado"]
 
-        etiquetaEstatus = Label(self.frameCitaD, text="Estatus: ", font=("Arial", 13))
+        etiquetaEstatus = Label(self.frameCitaD, text="Estatus: ", **label_style)
         etiquetaEstatus.grid(row=4, column=0, pady=5, sticky="w")
-        self.comboEstatus = ttk.Combobox(self.frameCitaD, state="readonly", values = self.listaEstatus)
-        self.comboEstatus.grid(row=4, column=2)
+        self.comboEstatus = ttk.Combobox(self.frameCitaD, state="readonly", values = self.listaEstatus, width=18)
+        self.comboEstatus.grid(row=4, column=1, padx=(0, x), columnspan=2, sticky="w")
         
-        etiquetaId = Label(self.frameCitaD, text="ID", font=("Arial", 13))
+        etiquetaId = Label(self.frameCitaD, text="ID", **label_style)
         etiquetaId.grid(row=5, column=0, pady=5, sticky="w")
-        self.campoId = Entry(self.frameCitaD, state="normal")
-        self.campoId.grid(row=5, column=2, pady=5)
+        self.campoId = Entry(self.frameCitaD, state="normal", **entry_style)
+        self.campoId.grid(row=5, column=1, pady=5, padx=(0, x), columnspan=2, sticky="w")
 
-        etiquetaServicios = Label(self.frameCitaD, text="Servicios: ", font=("Arial", 13))
+        etiquetaServicios = Label(self.frameCitaD, text="Servicios: ", **label_style)
         etiquetaServicios.grid(row=6, column=0, pady=5, sticky="w")
-        self.campoServicios = Text(self.frameCitaD, width=27, height=4)
+        self.campoServicios = Text(self.frameCitaD, width=27, height=4, **entry_style)
         self.campoServicios.grid(row=7, column=0, columnspan=3, padx= 2, pady = 5)
 
         #Botones de acción
-        self.botonInsertarCita = Button(self.frameCitaD, text="Insertar Cita", command= lambda: self.insercionCita())
+
+        # Botones de acción (Insertar y Actualizar Cita)
+        button_action_style_dark = {
+            "bg": "#4A90E2",  # Azul principal
+            "fg": "white",    # Texto blanco
+            "font": ("Segoe UI", 9, "bold"),
+            "bd": 0,
+            "relief": "flat",
+            "cursor": "hand2",
+            "activebackground": "#357ABD",
+            "activeforeground": "white",
+            "padx": 15,
+            "pady": 8
+        }
+
+        self.botonInsertarCita = Button(self.frameCitaD, text="Insertar Cita", command= lambda: self.insercionCita(), **button_action_style_dark)
         self.botonInsertarCita.grid(row=8, column=0, pady=5, padx=5, sticky="w")
-        self.botonActualizarCita = Button(self.frameCitaD, text="Actualizar Cita", command= lambda: self.actualizarCita())
+        self.botonActualizarCita = Button(self.frameCitaD, text="Actualizar Cita", command= lambda: self.actualizarCita(), **button_action_style_dark)
         self.botonActualizarCita.grid(row=9, column=0, pady=5, padx=5, sticky="w")
 
     def fechaSeleccionada(self, event):
@@ -214,7 +313,7 @@ class CitasFrame(tk.Frame):
 
 class ClientesFrame(tk.Frame):
     def __init__(self, parent, controlador):
-        super().__init__(parent)
+        super().__init__(parent, bg="#2C2525")
         self.controlador = controlador
         
         self.campoId = None
@@ -222,32 +321,55 @@ class ClientesFrame(tk.Frame):
         self.campoApellido = None
         self.campoTelefono = None
         self.campoNacimiento = None
-        self.campoId = None
 
         self.iniciarFrames()
         self.iniciarWidgets()
 
     def iniciarFrames(self):
-        self.framePrincipal = Frame(self, width=650, height=460, bg="black")
-        self.framePrincipal.grid(row=0, column=0)
-        self.framePrincipal.grid_propagate(False)
 
-        self.frameArribaC = Frame(self.framePrincipal, width=640, height=270, bg="white")
+        #self.frameArribaC = Frame(self, width=640, height=270, bg="white")
+        self.frameArribaC = Frame(self, width=640, height=260, bg="#333333", # Fondo blanco para la tabla
+                                  relief="flat", bd=0, highlightbackground="#E0E0E0", highlightthickness=1)
         self.frameArribaC.grid(row=0, column=0, padx=5, pady=5)
         self.frameArribaC.grid_propagate(False)
 
-        self.frameAbajoC = Frame(self.framePrincipal, width=640, height=170, bg="white")
+        #self.frameAbajoC = Frame(self, width=640, height=170, bg="white")
+        self.frameAbajoC = Frame(self, width=640, height=180, bg="#333333", # Fondo blanco para el formulario
+                                 relief="flat", bd=0, highlightbackground="#E0E0E0", highlightthickness=1)
         self.frameAbajoC.grid(row=1, column=0, padx=5, pady=5)
         self.frameAbajoC.grid_propagate(False)
 
     def iniciarWidgets(self):
         
 
-        etiquetaTitulo = Label(self.frameArribaC, text="Clientes registrados", font=("Arial", 13))
+        etiquetaTitulo = Label(self.frameArribaC, text="Clientes registrados", font=("Roboto", 20, "bold"), bg="#333333", fg="#FFFFFF")
         etiquetaTitulo.grid(row=0, column=0)
         #Creación de la tabla
+
+        #Aqui le daremos el diseño que tendrá la tabla 
+
+        """style = ttk.Style()
+        style.theme_use("clam") # Un tema más moderno para ttk
+        style.configure("Treeview", 
+                        background="#FFFFFF", 
+                        foreground="#333333", 
+                        rowheight=20, # Altura de fila un poco mayor
+                        fieldbackground="#FFFFFF",
+                        font=("Segoe UI", 8))
+        style.map("Treeview", 
+                  background=[('selected', '#4A90E2')]) # Azul vibrante para la selección
+
+        style.configure("Treeview.Heading", 
+                        font=("Segoe UI", 10, "bold"), 
+                        background="#E0E0E0", # Gris claro para encabezados
+                        foreground="#333333",
+                        relief="flat")
+        style.map("Treeview.Heading", 
+                  background=[('active', '#CCCCCC')]) # Gris más oscuro al pasar el ratón por el encabezado
+"""
+
         columnasTabla = ("nombre", "apellido", "telefono", "fecha", "numeroVisitas") #Tupla con los nombres de las columnas, la primera es con #0
-        self.tablaClientes = ttk.Treeview(self.frameArribaC, columns= columnasTabla, height=10, show="tree headings") #Constructor de la tabla
+        self.tablaClientes = ttk.Treeview(self.frameArribaC, columns= columnasTabla, height=9, show="tree headings") #Constructor de la tabla
         self.tablaClientes.grid(row=1, column=0, padx=10, pady=5)
 
         #se le asigna el ancho a cada columna
@@ -267,47 +389,75 @@ class ClientesFrame(tk.Frame):
 
 
         #Etiquetas del segundo frame
-        etiquetaTituloClientes = Label(self.frameAbajoC, text="Registro de clientes", font=("Arial", 12))
+        etiquetaTituloClientes = Label(self.frameAbajoC, text="Registro de clientes", font=("Roboto", 18, "bold"), bg="#333333", fg="#FFFFFF")
         etiquetaTituloClientes.grid(row=0, column=0)
+
+        # Estilo para Labels y Entrys
+        label_style = {"bg": "#333333", "fg": "#E0E0E0", "font": ("Segoe UI", 9, "bold")}
+        entry_style = {"bg": "#444444", "fg": "#E0E0E0", "bd": 1, "relief": "solid", 
+                       "font": ("Segoe UI", 10), "highlightbackground": "#CCCCCC", "highlightcolor": "#4A90E2", "highlightthickness": 1}
+
 
 
         #Etiquetas para entrys
-        etiquetaNombre = Label(self.frameAbajoC, text="Nombre: ")
+        etiquetaNombre = Label(self.frameAbajoC, text="Nombre: ", **label_style)
         etiquetaNombre.grid(row=1, column=0, sticky="w", pady=4)
-        self.campoNombre = Entry(self.frameAbajoC)
+        self.campoNombre = Entry(self.frameAbajoC, **entry_style)
         self.campoNombre.grid(row=1, column=1, padx=5)
 
-        etiquetaApellido = Label(self.frameAbajoC, text="Apellido: ")
+        etiquetaApellido = Label(self.frameAbajoC, text="Apellido: ", **label_style)
         etiquetaApellido.grid(row=2, column=0, sticky="w", pady=4)
-        self.campoApellido = Entry(self.frameAbajoC)
+        self.campoApellido = Entry(self.frameAbajoC, **entry_style)
         self.campoApellido.grid(row=2, column=1, padx=5)
 
-        etiquetaTelefono = Label(self.frameAbajoC, text="Telefono: ")
+        etiquetaTelefono = Label(self.frameAbajoC, text="Telefono: ", **label_style)
         etiquetaTelefono.grid(row=3, column=0, sticky="w", pady=4)
-        self.campoTelefono = Entry(self.frameAbajoC)
+        self.campoTelefono = Entry(self.frameAbajoC, **entry_style)
         self.campoTelefono.grid(row=3, column=1, padx=5)
 
-        etiquetaNacimiento = Label(self.frameAbajoC, text="Fecha de Nacimiento: ")
+        etiquetaNacimiento = Label(self.frameAbajoC, text="Fecha de Nacimiento: ", **label_style)
         etiquetaNacimiento.grid(row=4, column=0, sticky="w", pady=4)
-        self.campoNacimiento = Entry(self.frameAbajoC)
+        self.campoNacimiento = Entry(self.frameAbajoC, **entry_style)
         self.campoNacimiento.grid(row=4, column=1, padx=5)
 
-        etiquetaId = Label(self.frameAbajoC, text="Id: ")
+        etiquetaId = Label(self.frameAbajoC, text="Id: ", **label_style)
         etiquetaId.grid(row=5, column=0, sticky="w", pady=4)
-        self.campoId = Entry(self.frameAbajoC)
+        self.campoId = Entry(self.frameAbajoC, **entry_style)
         self.campoId.grid(row=5, column=1, padx=5)
 
-        self.botonMostrar = Button(self.frameAbajoC, text="Mostrar clientes", command= lambda: self.consultaGeneralClientes())
-        self.botonMostrar.grid(row=1, column=2, sticky="e", padx=10)
-        
-        self.botonBuscar = Button(self.frameAbajoC, text="Buscar Cliente", command= lambda: self.consultaCliente())
-        self.botonBuscar.grid(row=3, column=2, sticky="e", padx=10)
-        
-        self.botonRegistrar = Button(self.frameAbajoC, text="Registrar Cliente", command= lambda: self.insertarValoresCliente())
-        self.botonRegistrar.grid(row=4, column=2, sticky="e", padx=10)
+        #Configuracion de los botones
+        #Estilo:
+        button_action_style = {
+            "bg": "#4A90E2",  # Azul principal
+            "fg": "white",    # Texto blanco
+            "font": ("Segoe UI", 10, "bold"),
+            "bd": 0,
+            "relief": "flat",
+            "cursor": "hand2",
+            "activebackground": "#357ABD",
+            "activeforeground": "white",
+            "padx": 15,       # Padding horizontal interno
+            "pady": 3         # Padding vertical interno
+        }
 
-        self.botonActualizar = Button(self.frameAbajoC, text="Actualizar Cliente", command= lambda: self.actualizarValoresCliente())
-        self.botonActualizar.grid(row=5, column=2, sticky="e", padx=10)
+        #Se configuran
+
+        # Usamos un Frame para agrupar los botones y luego lo posicionamos con grid
+        button_group_frame = Frame(self.frameAbajoC, bg="#333333")
+        button_group_frame.grid(row=0, column=4, rowspan=7, padx=(20,20), pady=(5, 5), sticky="ne") # Alinear a la derecha superior
+        
+
+        self.botonMostrar = Button(button_group_frame, text="Mostrar clientes", command= lambda: self.consultaGeneralClientes(), **button_action_style)
+        self.botonMostrar.grid(row=1, column=0, sticky="e", padx=10, pady=(10, 6))
+        
+        self.botonBuscar = Button(button_group_frame, text="Buscar Cliente", command= lambda: self.consultaCliente(), **button_action_style)
+        self.botonBuscar.grid(row=3, column=0, sticky="e", padx=10, pady=6)
+        
+        self.botonRegistrar = Button(button_group_frame, text="Registrar Cliente", command= lambda: self.insertarValoresCliente(), **button_action_style)
+        self.botonRegistrar.grid(row=4, column=0, sticky="e", padx=10, pady=6)
+
+        self.botonActualizar = Button(button_group_frame, text="Actualizar Cliente", command= lambda: self.actualizarValoresCliente(), **button_action_style)
+        self.botonActualizar.grid(row=5, column=0, sticky="e", padx=10, pady=6)
 
         self.frameAbajoC.grid_columnconfigure(2, weight=1)
 
@@ -615,14 +765,14 @@ class BarberiaPrincipal(tk.Frame):
         self.frameTitulo.grid_propagate(False)
         #Se asigna la etiqueta al Frame
         titulo = Label(self.frameTitulo, text="¡Bienvenido a tu Barbería!", bg="#333333", fg="#E0E0E0") # Texto claro y fondo oscuro
-        titulo.config(font=("Montserrat", 28, "bold")) # Fuente moderna y negrita
+        titulo.config(font=("Segoe UI", 28, "bold")) # Fuente moderna y negrita
         titulo.grid(row=0, column=0, padx=240, pady=20)
         
         self.frameBotones = Frame(self.parent, width=150, height=460, bg="#2C2C2C", highlightbackground="#555555", highlightthickness=1) # Fondo más oscuro y borde sutil
         self.frameBotones.grid(row=1, column=0, padx=10, pady=10)
         self.frameBotones.grid_propagate(False)
 
-        self.framePrincipal = Frame(self.parent, width=650, height=460, bg="#F0F0F0", highlightbackground="#CCCCCC", highlightthickness=1) # Fondo claro para el contenido principal
+        self.framePrincipal = Frame(self.parent, width=650, height=460, bg="#000000", highlightbackground="#000000", highlightthickness=1) # Fondo claro para el contenido principal
         self.framePrincipal.grid(row=1, column=1, padx=10, pady=10)
         self.framePrincipal.grid_propagate(False)
 
@@ -721,11 +871,3 @@ class BarberiaPrincipal(tk.Frame):
 
 
         self.parent.config(menu=barraMenuP)
-
-
-"""if __name__ == "__main__":
-    root = tk.Tk()
-    Ventana =  BarberiaPrincipal(root)
-    Ventana.mainloop()
-    #root.destroy()
-"""
