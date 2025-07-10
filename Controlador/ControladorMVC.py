@@ -1,5 +1,5 @@
 #from ..Modelo.Conexion import *
-from Vista.VentanaPrincipal import *
+from Vista.VentanaPrincipal import BarberiaPrincipal
 import tkinter as tk
 from Modelo.ManejoClientes import *
 from Modelo.Conexion import *
@@ -46,6 +46,8 @@ class Controlador:
 if __name__ == "__main__":
     root = tk.Tk()
     control = Controlador(root)
+
+    root.resizable(False, False)
     root.mainloop()
     
     
