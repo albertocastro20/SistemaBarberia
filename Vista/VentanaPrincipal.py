@@ -10,6 +10,7 @@ from Vista.VistaBarberos import BarberosFrame
 from Vista.VistaCitas import CitasFrame
 from Vista.VistaClientes import ClientesFrame
 from Vista.VistaServicios import ServiciosFrame
+from Vista.VentanaVentas import VentasFrame
 
 #Librerias del Modelo
 from Modelo.Conexion import *
@@ -76,7 +77,7 @@ class BarberiaPrincipal(tk.Frame):
         
 
     def crearFramesSeccion(self):
-        for F in (CitasFrame, ClientesFrame, BarberosFrame, ServiciosFrame):
+        for F in (CitasFrame, ClientesFrame, BarberosFrame, ServiciosFrame, VentasFrame):
             pageName = F.__name__.replace("Frame", "")
             frame =  F(parent = self.framePrincipal, controlador = self.controlador_recibido)
             self.framesSeccion[pageName] = frame
@@ -137,7 +138,7 @@ class BarberiaPrincipal(tk.Frame):
         self.botonServicios = create_sidebar_button(self.frameBotones, "  SERVICIOS", lambda: activate_button(self.botonServicios, "Servicios"), 2)
         self.botonBarberos = create_sidebar_button(self.frameBotones, "  BARBEROS", lambda: activate_button(self.botonBarberos, "Barberos"), 3)
         self.botonInventario = create_sidebar_button(self.frameBotones, "  INVENTARIO", lambda: activate_button(self.botonInventario, "Inventario"), 4)
-        self.botonReportes = create_sidebar_button(self.frameBotones, "  REPORTES", lambda: activate_button(self.botonReportes, "Reportes"), 5)
+        self.botonReportes = create_sidebar_button(self.frameBotones, "  VENTAS", lambda: activate_button(self.botonReportes, "Ventas"), 5)
 
 
 

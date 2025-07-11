@@ -102,7 +102,7 @@ class CitasFrame(tk.Frame):
                         foreground="white",
                         relief="flat")
         style.map("Treeview.Heading", 
-                  background=[('active', '#34495E')]) # Color al pasar el ratón por encabezados
+                  background=[('active', '#34495E')]) # Color al pasar el ratón por encabezados"""
 
 
 
