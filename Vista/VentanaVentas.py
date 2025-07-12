@@ -9,6 +9,10 @@ class VentasFrame(tk.Frame):
 
         self.iniciarFrames()
         self.iniciarWidgets()
+        self.after(3, self.llenarTablaServicios)
+        self.after(3, self.llenarTablaProductos)
+
+        #self.llenarTablaServicios()
 
     def iniciarFrames(self):
         self.frameIzquierdo = Frame(self, width=270, height=460, bg="grey")
@@ -65,6 +69,7 @@ class VentasFrame(tk.Frame):
         for col in columnasServicios:
             self.tablaServicios.heading(col, text=col)
         self.tablaServicios.pack(padx=5)
+
 
         self.botonAgregarServicio = Button(frameServicios, text="Añadir Servicios")
         self.botonAgregarServicio.pack(padx=15, pady=15, fill="x")
@@ -138,5 +143,20 @@ class VentasFrame(tk.Frame):
         self.botonEliminarItem = Button(frameTotal, text="Eliminar Item", font=fuente)
         self.botonEliminarItem.grid(row=3, column=0, columnspan=1, sticky="w", padx=10)
 
-        self.botonFinalizarV = Button(frameTotal, text="Eliminar Item", font=fuente)
+        self.botonFinalizarV = Button(frameTotal, text="Finalizar Venta", font=fuente)
         self.botonFinalizarV.grid(row=4, column=0, columnspan=1, sticky="w", padx=10)
+
+    def llenarTablaServicios(self):
+        tuplaServicios = self.controlador.consultaServiciosVenta() 
+
+        for i in tuplaServicios:
+            tuplaNueva = (i[1], i[2])
+            self.tablaServicios.insert("", "end", text = i[0], values=tuplaNueva)
+
+    def llenarTablaProductos(self):
+        tuplaProductos = self.controlador.consultaProductos() 
+
+        for i in tuplaProductos:
+            tuplaNueva = (i[1], i[2])
+            self.tablaProductos.insert("", "end", text = i[0], values=tuplaNueva)
+        

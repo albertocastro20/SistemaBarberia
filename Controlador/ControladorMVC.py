@@ -1,19 +1,27 @@
 #from ..Modelo.Conexion import *
 from Vista.VentanaPrincipal import BarberiaPrincipal
 import tkinter as tk
-from Modelo.ManejoClientes import *
 from Modelo.Conexion import *
+from Modelo.ManejoClientes import *
 from Modelo.ManejoCitas import *
 from Modelo.Clases import *
+from Modelo.ManejoVentas import QuerysVentas
 
 class Controlador:
     def __init__(self, parent):
         self.parent = parent
-        self.vista =  BarberiaPrincipal(parent = self.parent, controlador_recibido= self)
+        self.vista =  BarberiaPrincipal(parent = self.parent, controlador_recibido= self) #Se pasa root y asi mismo como controlador
         self.conexion = Conexion("root", "Cris8426")
         self.manejoClientes = QuerysCliente(self.conexion)
+        self.manejoVentas = QuerysVentas(self.conexion) 
         self.manejoCitas = QuerysCita(self.conexion)
         
+    def consultaServiciosVenta(self):
+        #tuplaServicios = self.manejoVentas.consultaServicios()
+        tuplaServicios = self.manejoVentas.consultaServicios()
+
+        return tuplaServicios
+
     def insercionCliente(self, cliente):
         self.manejoClientes.insertarClientes(cliente)
 
@@ -41,6 +49,12 @@ class Controlador:
     def buscarCita(self, cita):
         citaRecibida = self.manejoCitas.consultarCita(cita)
         return citaRecibida
+    
+    def consultaProductos(self):
+        #tuplaServicios = self.manejoVentas.consultaServicios()
+        tuplaProductos = self.manejoVentas.consultaProductos()
+
+        return tuplaProductos
         
 
 if __name__ == "__main__":

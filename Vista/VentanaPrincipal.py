@@ -5,6 +5,10 @@ from tkinter import *
 from tkinter import ttk #Libreria con nuevow wg
 from tkcalendar import Calendar #Calendario
 
+#Librerias del Modelo
+from Modelo.Conexion import *
+from Modelo.Clases import *
+
 #Librerias de Vista
 from Vista.VistaBarberos import BarberosFrame
 from Vista.VistaCitas import CitasFrame
@@ -12,21 +16,13 @@ from Vista.VistaClientes import ClientesFrame
 from Vista.VistaServicios import ServiciosFrame
 from Vista.VentanaVentas import VentasFrame
 
-#Librerias del Modelo
-from Modelo.Conexion import *
-from Modelo.Clases import *
-
 #Librerias del Controlador
 #from Controlador.ControladorMVC import *
 
 #Librerias de Trabajo en la clase
 import datetime
 
-
 #Frame principal 650x460
-        
-
-
 
 class BarberiaPrincipal(tk.Frame):
 
@@ -46,7 +42,7 @@ class BarberiaPrincipal(tk.Frame):
 
         self.mostrarFrame("Citas")
 
-        self.conexion = Conexion("root", "Cris8426")
+        #self.conexion = Conexion("root", "Cris8426")
 
 
     def iniciarWidgets(self):
@@ -77,7 +73,7 @@ class BarberiaPrincipal(tk.Frame):
         
 
     def crearFramesSeccion(self):
-        for F in (CitasFrame, ClientesFrame, BarberosFrame, ServiciosFrame, VentasFrame):
+        for F in (CitasFrame, ClientesFrame, BarberosFrame, VentasFrame, ServiciosFrame):
             pageName = F.__name__.replace("Frame", "")
             frame =  F(parent = self.framePrincipal, controlador = self.controlador_recibido)
             self.framesSeccion[pageName] = frame
@@ -138,7 +134,7 @@ class BarberiaPrincipal(tk.Frame):
         self.botonServicios = create_sidebar_button(self.frameBotones, "  SERVICIOS", lambda: activate_button(self.botonServicios, "Servicios"), 2)
         self.botonBarberos = create_sidebar_button(self.frameBotones, "  BARBEROS", lambda: activate_button(self.botonBarberos, "Barberos"), 3)
         self.botonInventario = create_sidebar_button(self.frameBotones, "  INVENTARIO", lambda: activate_button(self.botonInventario, "Inventario"), 4)
-        self.botonReportes = create_sidebar_button(self.frameBotones, "  VENTAS", lambda: activate_button(self.botonReportes, "Ventas"), 5)
+        self.botonVentas = create_sidebar_button(self.frameBotones, "  VENTAS", lambda: activate_button(self.botonVentas, "Ventas"), 5)
 
 
 
