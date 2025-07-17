@@ -16,12 +16,7 @@ class Controlador:
         self.manejoVentas = QuerysVentas(self.conexion) 
         self.manejoCitas = QuerysCita(self.conexion)
         
-    def consultaServiciosVenta(self):
-        #tuplaServicios = self.manejoVentas.consultaServicios()
-        tuplaServicios = self.manejoVentas.consultaServicios()
-
-        return tuplaServicios
-
+# --------------------------- Querys Cliente -----------------------------------
     def insercionCliente(self, cliente):
         self.manejoClientes.insertarClientes(cliente)
 
@@ -35,6 +30,8 @@ class Controlador:
     def consultaGeneralCliente(self):
         tuplita = self.manejoClientes.consultaGeneral()
         return tuplita
+    
+# --------------------------- Querys Cita -----------------------------------
     
     def insercionCita(self, cita):
         self.manejoCitas.insertarCita(cita)
@@ -50,11 +47,39 @@ class Controlador:
         citaRecibida = self.manejoCitas.consultarCita(cita)
         return citaRecibida
     
+# --------------------------- Querys Venta -----------------------------------
+    
     def consultaProductos(self):
         #tuplaServicios = self.manejoVentas.consultaServicios()
         tuplaProductos = self.manejoVentas.consultaProductos()
 
         return tuplaProductos
+    
+    def iniciarVenta(self, idCliente):
+        self.manejoVentas.iniciarVenta(idCliente)
+        idTicket = self.manejoVentas.obtenerIdTicket()
+
+        return idTicket
+    
+    def insertarDProducto(self, detalleProducto):
+        self.manejoVentas.insertarDetalleProducto(detalleProducto)
+
+    def obtenerBarberos(self):
+        tuplaBarberos = self.manejoVentas.obtenerBarberos()
+
+        return tuplaBarberos
+    
+    def consultaServiciosVenta(self):
+        #tuplaServicios = self.manejoVentas.consultaServicios()
+        tuplaServicios = self.manejoVentas.consultaServicios()
+
+        return tuplaServicios
+    
+    def insertarServicioRealizado(self, servicioRealizado):
+        self.manejoVentas.insertarServicioRealizado(servicioRealizado)
+
+    def finalizarVenta(self, datosFaltantes):
+        self.manejoVentas.actualizarVenta(datosFaltantes)
         
 
 if __name__ == "__main__":

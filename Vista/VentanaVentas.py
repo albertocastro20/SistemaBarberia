@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
+#from tkinter import messagebox
+from tkinter.simpledialog import askinteger
+import datetime
 
 class VentasFrame(tk.Frame):
     def __init__(self, parent, controlador):
@@ -11,6 +14,7 @@ class VentasFrame(tk.Frame):
         self.iniciarWidgets()
         self.after(3, self.llenarTablaServicios)
         self.after(3, self.llenarTablaProductos)
+        self.after(3, self.llenarBarberos)
 
         #self.llenarTablaServicios()
 
@@ -24,6 +28,8 @@ class VentasFrame(tk.Frame):
         self.frameDerecho.grid_propagate(False)
 
     def iniciarWidgets(self):
+        eventoBotones = tk.Event()
+        
         #Componentes del Frame Izquierdo
         frameTitulo = Frame(self.frameIzquierdo, width=260, height=30, bg="grey")
         frameTitulo.grid(row=0, column=0, padx=5, pady=5)
@@ -34,7 +40,7 @@ class VentasFrame(tk.Frame):
         frameTitulo.grid_columnconfigure(0, weight=1)
 
         #Frame para el buscador
-        frameBuscadorCliente = Frame(self.frameIzquierdo, width=260, height=30)
+        frameBuscadorCliente = Frame(self.frameIzquierdo, width=260, height=60)
         frameBuscadorCliente.grid(row=1, column=0, padx=5, pady=5)
         frameBuscadorCliente.grid_propagate(False)
 
@@ -44,8 +50,14 @@ class VentasFrame(tk.Frame):
         self.campoCliente = Entry(frameBuscadorCliente, font=("Arial", 10))
         self.campoCliente.grid(row=0, column=1, pady=2)
 
-        self.botonBuscarCliente = Button(frameBuscadorCliente, text="Buscar")
-        self.botonBuscarCliente.grid(row=0, column=2, padx=(7, 3), pady=2)
+        self.botonIniciarVenta = Button(frameBuscadorCliente, text="Añadir", command= lambda: self.iniciarVenta())
+        self.botonIniciarVenta.grid(row=0, column=2, padx=(7, 3), pady=2)
+
+        etiquetaBarbero = Label(frameBuscadorCliente, text="Barbero: ", font=("Arial", 10))
+        etiquetaBarbero.grid(row=1, column=0, pady=2)
+
+        self.comboBarbero = ttk.Combobox(frameBuscadorCliente, font=("Arial", 10), width=17, state = "readonly")
+        self.comboBarbero.grid(row=1, column=1, pady=2)
 
         #Frame para el Nootebook
         self.notebookInformacion = ttk.Notebook(self.frameIzquierdo)
@@ -71,8 +83,11 @@ class VentasFrame(tk.Frame):
         self.tablaServicios.pack(padx=5)
 
 
-        self.botonAgregarServicio = Button(frameServicios, text="Añadir Servicios")
+        self.botonAgregarServicio = Button(frameServicios, text="Añadir Servicios", command= lambda: self.agregarItemsTabla(1))
         self.botonAgregarServicio.pack(padx=15, pady=15, fill="x")
+
+        self.tablaServicios.bind('<<TreeviewSelect>>', self.seleccionServicios) #Se le asigna un evento al seleccionar una fila
+
 
 
         #Pestaña de Productos
@@ -94,17 +109,28 @@ class VentasFrame(tk.Frame):
             self.tablaProductos.heading(col, text=col)
         self.tablaProductos.pack(padx=5)
 
-        self.botonAgregarProducto = Button(frameProductos, text="Añadir Producto")
+        self.botonAgregarProducto = Button(frameProductos, text="Añadir Producto", command= lambda: self.agregarItemsTabla(2))
         self.botonAgregarProducto.pack(padx=15, pady=15, fill="x")
+
+        self.tablaProductos.bind('<<TreeviewSelect>>', self.seleccionProductos) #Se le asigna un evento al seleccionar una fila
 
         #Componentes del Frame Derecho
 
         etiquetaTituloD = Label(self.frameDerecho, text="Ticket de compra", font=("Arial", 12))
-        etiquetaTituloD.grid(row=0, column=0, pady=3)
+        etiquetaTituloD.grid(row=0, column=0, pady=3, columnspan=2)
+
+        self.etiquetaMostrarCliente = Label(self.frameDerecho, text="Cliente:  ", font=("Arial", 9))
+        self.etiquetaMostrarCliente.grid(row=1, column=0, sticky="w", padx=5)
+        
+        self.etiquetaMostrarBarbero = Label(self.frameDerecho, text="Barbero: ", font=("Arial", 9))
+        self.etiquetaMostrarBarbero.grid(row=1, column=1, padx=5)
+
+        self.etiquetaIdVenta = Label(self.frameDerecho, text="ID Venta: ", font=("Arial", 8))
+        self.etiquetaIdVenta.grid(row=2, column=0, sticky="w", padx=10)
         
         columnasTabla = ("Item", "Cantidad", "Precio/U", "Subtotal")
-        self.tablaResumenVenta = ttk.Treeview(self.frameDerecho, columns=columnasTabla, height=10, show="headings")
-        self.tablaResumenVenta.grid(row=1, column=0, pady=10, padx=5)
+        self.tablaResumenVenta = ttk.Treeview(self.frameDerecho, columns=columnasTabla, height=9, show="headings")
+        self.tablaResumenVenta.grid(row=3, column=0, pady=5, padx=3, columnspan=2)
 
         self.tablaResumenVenta.column("Item", width=140)
         self.tablaResumenVenta.heading("Item", text="Item")
@@ -114,11 +140,11 @@ class VentasFrame(tk.Frame):
                 self.tablaResumenVenta.column(col, width=75)
                 self.tablaResumenVenta.heading(col, text= col)
 
-        frameTotal = Frame(self.frameDerecho, width=370, height=165, bg="grey")
-        frameTotal.grid(row=2, column=0, padx=5)
-        frameTotal.grid_propagate(False)
-
         #Componentes del Frame del Total
+        
+        frameTotal = Frame(self.frameDerecho, width=370, height=160, bg="grey")
+        frameTotal.grid(row=4, column=0, padx=5, pady=3, columnspan=2)
+        frameTotal.grid_propagate(False)
 
         fuente = ("Arial", 11)
         etiquetaSubtotal = Label(frameTotal, text="Subtotal: ", font=fuente)
@@ -132,6 +158,7 @@ class VentasFrame(tk.Frame):
 
         self.campoDescuento = Entry(frameTotal, font=fuente, width=10)
         self.campoDescuento.grid(row=1, column=1, pady=5, padx=5, sticky="e")
+        self.campoDescuento.bind("<KeyRelease>", self.aplicarDescuento)
 
         etiquetaTotal = Label(frameTotal, text="Total a pagar: ", font=fuente)
         etiquetaTotal.grid(row=2, column=0, pady=5, sticky="w", padx=10)
@@ -139,12 +166,15 @@ class VentasFrame(tk.Frame):
         self.etiquetaPTotal = Label(frameTotal, text="$ 0.00", font=fuente)
         self.etiquetaPTotal.grid(row=2, column=1, sticky="e")
 
+        self.comboMetodoPago = ttk.Combobox(frameTotal, values=("Efectivo", "Tarjeta", "Transferencia"), state="readonly", width=20)
+        self.comboMetodoPago.grid(row=3, column=0, padx=10, pady=5)
+
 
         self.botonEliminarItem = Button(frameTotal, text="Eliminar Item", font=fuente)
-        self.botonEliminarItem.grid(row=3, column=0, columnspan=1, sticky="w", padx=10)
+        self.botonEliminarItem.grid(row=4, column=0, columnspan=1, sticky="w", padx=10)
 
-        self.botonFinalizarV = Button(frameTotal, text="Finalizar Venta", font=fuente)
-        self.botonFinalizarV.grid(row=4, column=0, columnspan=1, sticky="w", padx=10)
+        self.botonFinalizarV = Button(frameTotal, text="Finalizar Venta", font=fuente, command=lambda: self.finalizarVenta())
+        self.botonFinalizarV.grid(row=4, column=1, columnspan=1, sticky="w", padx=10)
 
     def llenarTablaServicios(self):
         tuplaServicios = self.controlador.consultaServiciosVenta() 
@@ -159,4 +189,115 @@ class VentasFrame(tk.Frame):
         for i in tuplaProductos:
             tuplaNueva = (i[1], i[2])
             self.tablaProductos.insert("", "end", text = i[0], values=tuplaNueva)
+    
+    def limpiarTabla(self):
+        self.tablaResumenVenta.delete(*self.tablaResumenVenta.get_children())
+
+    def seleccionServicios(self, event):
+        servicioSeleccionado = self.tablaServicios.selection()
         
+        #Se le asigna un if para verificar que la tupla que se devuelve no está vacia
+        #Se hace de esta manera por que al eliminar todos los elementos de la tabla se genera de nuevo el evento
+        if servicioSeleccionado:
+        
+            self.idServicio = self.tablaServicios.item(servicioSeleccionado, "text")
+            valoresServicio = self.tablaServicios.item(servicioSeleccionado, "values")
+            self.tuplaServicioSeleccionado = (valoresServicio[0], 1, valoresServicio[1], valoresServicio[1] * 1) #El valor 1 es el precio
+            self.precioServicio = self.tuplaServicioSeleccionado[3]
+
+
+    def seleccionProductos(self, evento):
+        productoSeleccionado = self.tablaProductos.selection()
+        
+        #Se le asigna un if para verificar que la tupla que se devuelve no está vacia
+        #Se hace de esta manera por que al eliminar todos los elementos de la tabla se genera de nuevo el evento
+        if productoSeleccionado:
+        
+            self.idProducto = self.tablaProductos.item(productoSeleccionado, "text")
+            valoresProducto = self.tablaProductos.item(productoSeleccionado, "values")
+            self.nombreProducto = valoresProducto[0]
+            self.precioProducto = valoresProducto[1]
+    
+    def agregarItemsTabla(self, boton):
+        
+        if (boton == 1):
+            #tuplaServicio = self.seleccionServicios    
+            fecha = datetime.datetime.now()
+            cadenaFecha = fecha.strftime('%Y-%m-%d %H:%M')
+            print(self.tuplaServicioSeleccionado)
+            self.tablaResumenVenta.insert("", "end", values=self.tuplaServicioSeleccionado)
+            print(f"El id es {self.idServicio}")
+
+            tuplaServicioRealizado = (cadenaFecha, self.idTicket, self.idServicio, self.indiceBarbero)
+            self.controlador.insertarServicioRealizado(tuplaServicioRealizado)
+
+            self.subtotal += int(self.precioServicio)
+
+            self.etiquetaPSubtotal.config(text=str("$ "+str(self.subtotal)))
+
+            self.tablaServicios.selection_remove(*self.tablaServicios.get_children())
+
+        if(boton == 2):
+            cantidad = askinteger("Cantidad", "Ingrese una cantidad: ")
+            tuplaProductosTabla = (self.nombreProducto, cantidad, self.precioProducto, cantidad*int(self.precioProducto))
+            tuplaProductosQuery = (cantidad, int(self.precioProducto), cantidad*int(self.precioProducto), self.idTicket, self.idProducto)
+            self.controlador.insertarDProducto(tuplaProductosQuery)
+
+            self.tablaResumenVenta.insert("", "end", values = tuplaProductosTabla)
+
+            self.subtotal += int(tuplaProductosTabla[3])
+            self.etiquetaPSubtotal.config(text="$ "+str(self.subtotal))
+
+            self.tablaProductos.selection_remove(*self.tablaProductos.get_children())
+
+    def iniciarVenta(self):
+        self.idTicket = self.controlador.iniciarVenta(self.campoCliente.get())
+        self.etiquetaMostrarCliente.config(text="Cliente: "+self.campoCliente.get())
+        self.etiquetaIdVenta.config(text="Venta: "+str(self.idTicket))
+        
+        self.indiceBarbero = self.comboBarbero.current() + 1
+        print(f"el Id del barbero es {self.indiceBarbero}")
+        self.etiquetaMostrarBarbero.config(text="Barbero: "+self.comboBarbero.get())
+
+        self.subtotal = 0
+
+        self.botonIniciarVenta.config(state= "disabled")
+
+    def llenarBarberos(self):
+        tuplaBarberos = self.controlador.obtenerBarberos()
+        listaNombreBarberos = list()
+
+        for i in tuplaBarberos:
+            cadenaBarberos = str(i[0])+" - "+i[1]+" "+i[2]
+            listaNombreBarberos.append(cadenaBarberos)
+
+        print(listaNombreBarberos)
+        self.comboBarbero.config(values=listaNombreBarberos)
+
+    def aplicarDescuento(self, event):
+        self.descuento = int(self.campoDescuento.get())
+        self.totalVenta = self.subtotal - (self.subtotal * (self.descuento / 100))
+
+        self.etiquetaPTotal.config(text="$ "+str(self.totalVenta))
+
+    def finalizarVenta(self):
+        datosFaltantes = (self.totalVenta, self.comboMetodoPago.get(), self.descuento, self.subtotal, self.idTicket)
+        print(datosFaltantes)
+        self.controlador.finalizarVenta(datosFaltantes)
+
+        self.subtotal = 0
+        self.limpiarWidgets()
+        
+
+    def limpiarWidgets(self):
+        self.tablaResumenVenta.delete(*self.tablaResumenVenta.get_children())
+        self.campoCliente.delete(0, END)
+        self.botonIniciarVenta.config(state= "normal")
+        self.comboBarbero.set("")
+        self.etiquetaIdVenta.config(text="Venta: ")
+        self.etiquetaMostrarBarbero.config(text="Barbero: ")
+        self.etiquetaMostrarCliente.config(text="Cliente: ")
+        self.etiquetaPSubtotal.config(text="$ 0.00")
+        self.etiquetaPTotal.config(text="$ 0.00")
+        self.campoDescuento.delete(0, END)
+        self.comboMetodoPago.set("")
