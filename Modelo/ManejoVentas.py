@@ -71,7 +71,7 @@ class QuerysVentas():
             except Error as e:
                 print(e)
 
-        print(id)
+        #print(id)
 
         for i in id:
             idTicket = i[0]

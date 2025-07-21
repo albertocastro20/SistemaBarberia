@@ -136,6 +136,8 @@ class BarberiaPrincipal(tk.Frame):
         self.botonInventario = create_sidebar_button(self.frameBotones, "  INVENTARIO", lambda: activate_button(self.botonInventario, "Inventario"), 4)
         self.botonVentas = create_sidebar_button(self.frameBotones, "  VENTAS", lambda: activate_button(self.botonVentas, "Ventas"), 5)
 
+        self.botonInventario.config(state= "disabled")
+
 
 
     def iniciarBarraMenu(self):

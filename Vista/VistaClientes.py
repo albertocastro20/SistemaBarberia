@@ -172,10 +172,12 @@ class ClientesFrame(tk.Frame):
     def insertarValoresCliente(self):
         #Llama a la funcion que inserta un cliente en la BD
         self.controlador.insercionCliente(self.obtenerValores())
+        tk.messagebox.showinfo("Nuevo Cliente", "Cliente registrado correctamente")
 
     def actualizarValoresCliente(self):
         #Funcion que actualiza los valores de un cliente
         self.controlador.actualizarCliente(self.obtenerValores())
+        tk.messagebox.showinfo("Actualización Cliente", "Información Actualizada")
 
     #Consulta a un cliente en específico
     def consultaCliente(self):

@@ -255,9 +255,11 @@ class CitasFrame(tk.Frame):
     def insercionCita(self):
         self.controlador.insercionCita(self.obtenerValores())
         self.limpiarEntrys()
+        tk.messagebox.showinfo("Registro cita", "Cita Registrada")
 
     def actualizarCita(self):
         self.controlador.actualizarCita(self.obtenerValores())
+        tk.messagebox.showinfo("Actualización cita", "Información de cita actualizada")
 
     def limpiarTabla(self):
         self.tablaCitas.delete(*self.tablaCitas.get_children())

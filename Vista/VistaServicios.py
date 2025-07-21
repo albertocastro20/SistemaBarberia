@@ -6,26 +6,44 @@ from tkcalendar import Calendar #Calendario
 
 class ServiciosFrame(tk.Frame):
     def __init__(self, parent, controlador):
-        super().__init__(parent)
+        super().__init__(parent, bg = "#2C2525")
         self.controlador = controlador
         self.iniciarFrames()
         self.iniciarWidgets()
 
     def iniciarFrames(self):
-        self.framePrincipal = Frame(self, width=650, height=460, bg="black")
-        self.framePrincipal.grid(row=0, column=0)
-        self.framePrincipal.grid_propagate(False)
 
-        self.frameArribaC = Frame(self.framePrincipal, width=640, height=270, bg="white")
+        self.frameArribaC = Frame(self, width=640, height=270, bg="#333333", # Fondo blanco para la tabla
+                                  relief="flat", bd=0, highlightbackground="#E0E0E0", highlightthickness=1)
         self.frameArribaC.grid(row=0, column=0, padx=5, pady=5)
         self.frameArribaC.grid_propagate(False)
 
-        self.frameAbajoC = Frame(self.framePrincipal, width=640, height=170, bg="white")
+        self.frameAbajoC = Frame(self, width=640, height=170, bg="#333333", # Fondo blanco para la tabla
+                                  relief="flat", bd=0, highlightbackground="#E0E0E0", highlightthickness=1)
         self.frameAbajoC.grid(row=1, column=0, padx=5, pady=5)
         self.frameAbajoC.grid_propagate(False)
 
     def iniciarWidgets(self):
-        etiquetaTitulo = Label(self.frameArribaC, text="Catálogo de Servicios", font=("Arial", 13))
+        # Estilo para Labels y Entrys
+        label_style = {"bg": "#333333", "fg": "#E0E0E0", "font": ("Segoe UI", 9, "bold")}
+        entry_style = {"bg": "#444444", "fg": "#E0E0E0", "bd": 1, "relief": "solid", 
+                       "font": ("Segoe UI", 10), "highlightbackground": "#CCCCCC", "highlightcolor": "#4A90E2", "highlightthickness": 1}
+        #Estilo:
+        button_action_style = {
+            "bg": "#4A90E2",  # Azul principal
+            "fg": "white",    # Texto blanco
+            "font": ("Segoe UI", 9, "bold"),
+            "bd": 0,
+            "relief": "flat",
+            "cursor": "hand2",
+            "activebackground": "#357ABD",
+            "activeforeground": "white",
+            "padx": 15,       # Padding horizontal interno
+            "pady": 3         # Padding vertical interno
+        }
+
+
+        etiquetaTitulo = Label(self.frameArribaC, text="Catálogo de Servicios", font=("Roboto", 20, "bold"), bg="#333333", fg="#FFFFFF")
         etiquetaTitulo.grid(row=0, column=0)
         #Creación de la tabla
         columnasTabla = ("nombre", "costo", "duracion", "estatus", "descripcion") #Tupla con los nombres de las columnas, la primera es con #0
@@ -49,48 +67,48 @@ class ServiciosFrame(tk.Frame):
 
 
         #Etiquetas del segundo frame
-        etiquetaTituloBarberos = Label(self.frameAbajoC, text="Registro de Servicios", font=("Arial", 12))
+        etiquetaTituloBarberos = Label(self.frameAbajoC, text="Registro de Servicios", **label_style)
         etiquetaTituloBarberos.grid(row=0, column=0)
 
 
         #Etiquetas para entrys
-        etiquetaNombre = Label(self.frameAbajoC, text="Nombre: ")
+        etiquetaNombre = Label(self.frameAbajoC, text="Nombre: ", **label_style)
         etiquetaNombre.grid(row=1, column=0, sticky="w", pady=4)
-        self.campoNombre = Entry(self.frameAbajoC)
+        self.campoNombre = Entry(self.frameAbajoC, **entry_style)
         self.campoNombre.grid(row=1, column=1, padx=5)
 
-        etiquetaDescripcion = Label(self.frameAbajoC, text="Descripción: ")
+        etiquetaDescripcion = Label(self.frameAbajoC, text="Descripción: ", **label_style)
         etiquetaDescripcion.grid(row=1, column=2, sticky="w", pady=4)
-        self.campoDescripcion = Entry(self.frameAbajoC)
+        self.campoDescripcion = Entry(self.frameAbajoC, **entry_style)
         self.campoDescripcion.grid(row=1, column=3, padx=5)
 
-        etiquetaCosto = Label(self.frameAbajoC, text="Costo: ")
+        etiquetaCosto = Label(self.frameAbajoC, text="Costo: ", **label_style)
         etiquetaCosto.grid(row=3, column=0, sticky="w", pady=4)
-        self.campoCosto = Entry(self.frameAbajoC)
+        self.campoCosto = Entry(self.frameAbajoC, **entry_style)
         self.campoCosto.grid(row=3, column=1, padx=5)
 
-        etiquetaDuracion = Label(self.frameAbajoC, text="Duración: ")
+        etiquetaDuracion = Label(self.frameAbajoC, text="Duración: ", **label_style)
         etiquetaDuracion.grid(row=4, column=0, sticky="w", pady=4)
-        self.campoDuracion = Entry(self.frameAbajoC)
+        self.campoDuracion = Entry(self.frameAbajoC, **entry_style)
         self.campoDuracion.grid(row=4, column=1, padx=5)
 
-        etiquetaId = Label(self.frameAbajoC, text="Id: ")
+        etiquetaId = Label(self.frameAbajoC, text="Id: ", **label_style)
         etiquetaId.grid(row=5, column=0, sticky="w", pady=4)
-        self.campoId = Entry(self.frameAbajoC)
+        self.campoId = Entry(self.frameAbajoC, **entry_style)
         self.campoId.grid(row=5, column=1, padx=5)
 
-        etiquetaEstatus = Label(self.frameAbajoC, text="Estatus: ")
+        etiquetaEstatus = Label(self.frameAbajoC, text="Estatus: ", **label_style)
         etiquetaEstatus.grid(row=2, column=0, sticky="w", pady=4)
-        self.campoEstatus = Entry(self.frameAbajoC)
+        self.campoEstatus = Entry(self.frameAbajoC, **entry_style)
         self.campoEstatus.grid(row=2, column=1, padx=5)
 
-        self.botonRegistrar = Button(self.frameAbajoC, text="Registrar Servicio")
+        self.botonRegistrar = Button(self.frameAbajoC, text="Registrar Servicio", **button_action_style)
         self.botonRegistrar.grid(row=4, column=4, sticky="e", padx=10)
 
-        self.botonActualizar = Button(self.frameAbajoC, text="Actualizar Servicio")
+        self.botonActualizar = Button(self.frameAbajoC, text="Actualizar Servicio", **button_action_style)
         self.botonActualizar.grid(row=5, column=4, sticky="e", padx=10)
 
-        self.botonEliminar =  Button(self.frameAbajoC, text="Eliminar Servicio")
+        self.botonEliminar =  Button(self.frameAbajoC, text="Eliminar Servicio", **button_action_style)
         self.botonEliminar.grid(row=3, column=4, sticky="e", padx=10)
 
         self.frameAbajoC.grid_columnconfigure(4, weight=1)
