@@ -90,15 +90,15 @@ class ClientesFrame(tk.Frame):
 
         # Estilo para Labels y Entrys
         label_style = {"bg": "#333333", "fg": "#E0E0E0", "font": ("Segoe UI", 9, "bold")}
-        entry_style = {"bg": "#444444", "fg": "#E0E0E0", "bd": 1, "relief": "solid", 
-                       "font": ("Segoe UI", 10), "highlightbackground": "#CCCCCC", "highlightcolor": "#4A90E2", "highlightthickness": 1}
+        entry_style = {"bg": "#444444", "fg": "#E0E0E0", "bd": 1, "relief": "solid",
+                       "font": ("Segoe UI", 10), "highlightbackground": "#CCCCCC", "highlightcolor": "#4A90E2", "highlightthickness": 1, "readonlybackground": "#444444", "disabledforeground": "#E0E0E0"}
 
 
 
         #Etiquetas para entrys
         etiquetaNombre = Label(self.frameAbajoC, text="Nombre: ", **label_style)
         etiquetaNombre.grid(row=1, column=0, sticky="w", pady=4)
-        self.campoNombre = Entry(self.frameAbajoC, **entry_style)
+        self.campoNombre = Entry(self.frameAbajoC, **entry_style, )
         self.campoNombre.grid(row=1, column=1, padx=5)
 
         etiquetaApellido = Label(self.frameAbajoC, text="Apellido: ", **label_style)
@@ -111,10 +111,40 @@ class ClientesFrame(tk.Frame):
         self.campoTelefono = Entry(self.frameAbajoC, **entry_style)
         self.campoTelefono.grid(row=3, column=1, padx=5)
 
-        etiquetaNacimiento = Label(self.frameAbajoC, text="Fecha de Nacimiento: ", **label_style)
+        
+        #--------------------Seccion de Fechas de nacimiento ------------------------------------
+        etiquetaNacimiento = Label(self.frameAbajoC, text="Fecha de Nacimiento (dd/mm/yyyy):", **label_style)
         etiquetaNacimiento.grid(row=4, column=0, sticky="w", pady=4)
-        self.campoNacimiento = Entry(self.frameAbajoC, **entry_style)
-        self.campoNacimiento.grid(row=4, column=1, padx=5)
+        frameFecha = Frame(self.frameAbajoC, width=146, height=25, bg="#333333", # Fondo blanco para el formulario
+                                 relief="flat", bd=0, highlightbackground="#E0E0E0", highlightthickness=1)
+        frameFecha.grid(row=4, column=1)
+        frameFecha.grid_propagate(False)
+
+        listaDia = list()
+        for i in range(1, 32, 1):
+            listaDia.append(i)
+        
+        meses = ("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
+
+        
+        self.comboDia = ttk.Combobox(frameFecha, values=listaDia, width=3, state= "readonly")
+        self.comboDia.grid(row=0, column=0, padx=2, pady=2)
+
+        self.comboMes = ttk.Combobox(frameFecha, values= meses, width=4, state= "readonly")
+        self.comboMes.grid(row=0, column=1, padx=2, pady=2)
+
+        listaYear = list()
+
+        for i in range(2025, 1940, -1):
+            listaYear.append(i)
+
+        self.comboYear = ttk.Combobox(frameFecha, values=listaYear, width=5, state= "readonly")
+        self.comboYear.grid(row=0, column=2, padx=2, pady=2)
+        #self.campoNacimiento = Entry(self.frameAbajoC, **entry_style)
+        #self.campoNacimiento.grid(row=4, column=1, padx=5)
+
+
+        #------------------------------------------------------------------------------------------
 
         etiquetaId = Label(self.frameAbajoC, text="Id: ", **label_style)
         etiquetaId.grid(row=5, column=0, sticky="w", pady=4)
@@ -160,10 +190,19 @@ class ClientesFrame(tk.Frame):
     def obtenerValores(self):
         """Esta funcion obtiene los valores de los campos"""
         id = self.campoId.get()
-        nombre = self.campoNombre.get()
-        apellido = self.campoApellido.get()
+        nombre = self.campoNombre.get().capitalize()
+        apellido = self.campoApellido.get().capitalize()
         telefono = self.campoTelefono.get()
-        nacimiento = self.campoNacimiento.get()
+
+        #---Fecha----
+        print(self.comboYear.get())
+        print(str(self.comboMes.current() + 1))
+        print(self.comboDia.get())
+        nacimiento = self.comboYear.get() +"-"+str(self.comboMes.current() + 1)+"-"+self.comboDia.get()
+
+
+
+        #nacimiento = self.campoNacimiento.get()
         cli = Cliente(id, nombre, apellido, telefono, nacimiento, None)
 
         #Retorna un objeto de Cliente que servirá para tfodas las demas funciones
@@ -171,13 +210,25 @@ class ClientesFrame(tk.Frame):
         
     def insertarValoresCliente(self):
         #Llama a la funcion que inserta un cliente en la BD
-        self.controlador.insercionCliente(self.obtenerValores())
-        tk.messagebox.showinfo("Nuevo Cliente", "Cliente registrado correctamente")
+        validado = self.validarCampos()
+        if(validado):
+            self.controlador.insercionCliente(self.obtenerValores())
+            tk.messagebox.showinfo("Nuevo Cliente", "Cliente registrado correctamente")
+            self.limpiarEntrys()
+        else:
+            tk.messagebox.showinfo("Error", "Error en alguno de los campos")
 
     def actualizarValoresCliente(self):
         #Funcion que actualiza los valores de un cliente
-        self.controlador.actualizarCliente(self.obtenerValores())
-        tk.messagebox.showinfo("Actualización Cliente", "Información Actualizada")
+        validado = self.validarCampos()
+        if(validado):
+            self.controlador.actualizarCliente(self.obtenerValores())
+            tk.messagebox.showinfo("Actualización Cliente", "Información Actualizada")
+
+            self.limpiarEntrys()
+        
+        else:
+            tk.messagebox.showinfo("Error", "Error en alguno de los campos")
 
     #Consulta a un cliente en específico
     def consultaCliente(self):
@@ -200,8 +251,11 @@ class ClientesFrame(tk.Frame):
             tuplaNueva = (i[1], i[2], i[3], i[4], i[5])
             self.tablaClientes.insert("", "end", text = i[0], values=tuplaNueva)
 
+        
+
     def seleccionCliente(self, evento):
         self.limpiarEntrys()
+        self.campoId.config(state="normal")
         
         #Con esa función se obtiene los id de las filas seleccionadas
         clienteSeleccionado = self.tablaClientes.selection()
@@ -219,19 +273,46 @@ class ClientesFrame(tk.Frame):
             self.campoNombre.insert(0, string=tuplaValores[0])
             self.campoApellido.insert(0, string = tuplaValores[1])
             self.campoTelefono.insert(0, string = tuplaValores[2])
-            self.campoNacimiento.insert(0, string= tuplaValores[3])
+            #self.campoNacimiento.insert(0, string= tuplaValores[3])
+            fecha = tuplaValores[3]
+            self.comboDia.set(fecha[8:])
+            mes = int(fecha[5:7])
 
+            self.comboMes.current(mes-1)
+            self.comboYear.set(fecha[:4])
+
+            #self.comboDia[:-2]
+
+        self.campoId.config(state= "readonly")
         #self.tablaClientes.selection_remove(self.tablaClientes.get_children())
 
     def limpiarEntrys(self):
         
         #END especifica el ultimo caracter
+        self.campoId.config(state="normal")
         self.campoId.delete(0, END)
         self.campoNombre.delete(0, END)
         self.campoApellido.delete(0, END)
         self.campoTelefono.delete(0, END)
-        self.campoNacimiento.delete(0, END)
+        #self.campoNacimiento.delete(0, END)
+        self.comboDia.set("")
+        self.comboMes.set("")
+        self.comboYear.set("")
 
     def limpiarTabla(self):
         self.tablaClientes.delete(*self.tablaClientes.get_children())
         #self.tablaClientes.selection_remove(*self.tablaClientes.get_children())
+
+    def validarCampos(self):
+        validado = True
+        if(self.campoTelefono.get().isnumeric() == False):
+            validado = False
+
+        if(len(self.campoTelefono.get()) != 10 ):
+            validado = False
+
+        if(self.campoNombre.get().isalpha() == False or self.campoApellido.get().isalpha() == False):
+            validado = False
+
+        return validado
+            
