@@ -314,5 +314,8 @@ class ClientesFrame(tk.Frame):
         if(self.campoNombre.get().isalpha() == False or self.campoApellido.get().isalpha() == False):
             validado = False
 
+        if(self.comboDia.get() == "" or self.comboMes.get() == "" or self.comboYear.get() == ""):
+            validado = False
+
         return validado
             

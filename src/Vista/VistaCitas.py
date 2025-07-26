@@ -12,6 +12,8 @@ class CitasFrame(tk.Frame):
     def __init__(self, parent, controlador):
         super().__init__(parent, bg= "#2C2525")
         self.controlador = controlador
+
+        self.after(3, self.llenarBarberos)
         self.iniciarFramesCitas()
         self.iniciarWidgetsCitas()
 
@@ -163,8 +165,9 @@ class CitasFrame(tk.Frame):
 
         etiquetaBarbero = Label(self.frameCitaD, text="Barbero (id): ", **label_style)
         etiquetaBarbero.grid(row=2, column=0, pady=5, sticky="w")
-        self.campoBarbero = Entry(self.frameCitaD, **entry_style)
-        self.campoBarbero.grid(row=2, column=1, padx=(0, x), columnspan=2, sticky="w")
+        
+        self.comboBarbero = ttk.Combobox(self.frameCitaD, state="readonly", width=18)
+        self.comboBarbero.grid(row=2, column=1, padx=(0, x), columnspan=2, sticky="w")
 
         #Cambiar por comboBox
 
@@ -195,7 +198,7 @@ class CitasFrame(tk.Frame):
         
         etiquetaId = Label(self.frameCitaD, text="ID", **label_style)
         etiquetaId.grid(row=5, column=0, pady=5, sticky="w")
-        self.campoId = Entry(self.frameCitaD, state="normal", **entry_style)
+        self.campoId = Entry(self.frameCitaD, state="normal", **entry_style, readonlybackground= "#444444", disabledforeground= "#E0E0E0")
         self.campoId.grid(row=5, column=1, pady=5, padx=(0, x), columnspan=2, sticky="w")
 
         etiquetaServicios = Label(self.frameCitaD, text="Servicios: ", **label_style)
@@ -245,7 +248,7 @@ class CitasFrame(tk.Frame):
         estatus = self.comboEstatus.get()
         comentarios = self.campoServicios.get(1.0, END)
         idCliente = self.campoCliente.get()
-        idBarbero = self.campoBarbero.get()
+        idBarbero = (self.comboBarbero.current()) + 1
         id = self.campoId.get()
 
         citaObtenida = Cita(id, fecha, hora, estatus, comentarios, idCliente, idBarbero)
@@ -253,27 +256,40 @@ class CitasFrame(tk.Frame):
         return citaObtenida
 
     def insercionCita(self):
-        self.controlador.insercionCita(self.obtenerValores())
-        self.limpiarEntrys()
-        tk.messagebox.showinfo("Registro cita", "Cita Registrada")
+        
+        validado = self.validarCampos()
+        if(validado):
+            self.controlador.insercionCita(self.obtenerValores())
+            self.limpiarEntrys()
+            tk.messagebox.showinfo("Registro cita", "Cita Registrada")
+        else:
+            tk.messagebox.showinfo("Error", "Error en alguno de los campos")
 
     def actualizarCita(self):
-        self.controlador.actualizarCita(self.obtenerValores())
-        tk.messagebox.showinfo("Actualización cita", "Información de cita actualizada")
+        validado = self.validarCampos()
+        if(validado):
+            self.controlador.actualizarCita(self.obtenerValores())
+            self.limpiarEntrys()
+            tk.messagebox.showinfo("Actualización cita", "Información de cita actualizada")
+
+        else:
+            tk.messagebox.showinfo("Error", "Error en alguno de los campos")
 
     def limpiarTabla(self):
         self.tablaCitas.delete(*self.tablaCitas.get_children())
 
     def limpiarEntrys(self):
+        self.campoId.config(state="normal")
         self.campoId.delete(0, END)
         self.campoCliente.delete(0, END)
-        self.campoBarbero.delete(0, END)
+        self.comboBarbero.set("")
         self.campoServicios.delete(1.0, END)
         self.comboEstatus.set("")
         self.comboHora.set("")
 
     def seleccionadorCita(self, event):
         self.limpiarEntrys()
+        self.campoId.config(state="normal")
         
         citaSeleccionada = self.tablaCitas.selection()
 
@@ -298,8 +314,29 @@ class CitasFrame(tk.Frame):
                 self.comboEstatus.current(self.listaEstatus.index(citita[3]))
                 self.campoServicios.insert(1.0, citita[4])
                 self.campoCliente.insert(0, string= citita[5])
-                self.campoBarbero.insert(0, string= citita[6])
+                idBarbero = int(citita[6])
+                self.comboBarbero.current(idBarbero - 1)
 
-    def buscarCita(self):
-        pass
-        # self.controlador.buscarCita()
+        self.campoId.config(state="readonly")
+
+    
+    def llenarBarberos(self):
+        tuplaBarberos = self.controlador.obtenerBarberos()
+        listaNombreBarberos = list()
+
+        for i in tuplaBarberos:
+            cadenaBarberos = str(i[0])+" - "+i[1]+" "+i[2]
+            listaNombreBarberos.append(cadenaBarberos)
+
+        #print(listaNombreBarberos)
+        self.comboBarbero.config(values=listaNombreBarberos)
+
+    def validarCampos(self):
+        validado = True
+        if(self.campoCliente.get().isnumeric() == False):
+            validado = False
+        
+        if(self.comboBarbero.get() == "" or self.comboHora.get() == "" or self.comboEstatus.get() == ""):
+            validado = False
+
+        return validado

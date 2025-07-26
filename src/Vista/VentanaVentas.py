@@ -105,7 +105,7 @@ class VentasFrame(tk.Frame):
         self.tablaServicios.pack(padx=5)
 
 
-        self.botonAgregarServicio = Button(frameServicios, text="Añadir Servicios", command= lambda: self.agregarItemsTabla(1), **button_style)
+        self.botonAgregarServicio = Button(frameServicios, text="Añadir Servicios", command= lambda: self.agregarItemsTabla(1), **button_style, state="disabled")
         self.botonAgregarServicio.pack(padx=15, pady=15, fill="x")
 
         self.tablaServicios.bind('<<TreeviewSelect>>', self.seleccionServicios) #Se le asigna un evento al seleccionar una fila
@@ -132,7 +132,7 @@ class VentasFrame(tk.Frame):
             self.tablaProductos.heading(col, text=col)
         self.tablaProductos.pack(padx=5)
 
-        self.botonAgregarProducto = Button(frameProductos, text="Añadir Producto", command= lambda: self.agregarItemsTabla(2), **button_style)
+        self.botonAgregarProducto = Button(frameProductos, text="Añadir Producto", command= lambda: self.agregarItemsTabla(2), **button_style, state="disabled")
         self.botonAgregarProducto.pack(padx=15, pady=15, fill="x")
 
         self.tablaProductos.bind('<<TreeviewSelect>>', self.seleccionProductos) #Se le asigna un evento al seleccionar una fila
@@ -196,10 +196,10 @@ class VentasFrame(tk.Frame):
         self.comboMetodoPago.grid(row=3, column=1, padx=10, pady=5)
 
 
-        self.botonEliminarItem = Button(frameTotal, text="Eliminar Item", **button_style)
+        self.botonEliminarItem = Button(frameTotal, text="Eliminar Item", **button_style, state="disabled", command= lambda: self.eliminarItem())
         self.botonEliminarItem.grid(row=4, column=0, columnspan=1, sticky="w", padx=10)
 
-        self.botonFinalizarV = Button(frameTotal, text="Finalizar Venta", command=lambda: self.finalizarVenta(), **button_style)
+        self.botonFinalizarV = Button(frameTotal, text="Finalizar Venta", command=lambda: self.finalizarVenta(), **button_style, state="disabled")
         self.botonFinalizarV.grid(row=4, column=1, columnspan=1, sticky="w", padx=10)
 
     def llenarTablaServicios(self):
@@ -277,18 +277,26 @@ class VentasFrame(tk.Frame):
             self.tablaProductos.selection_remove(*self.tablaProductos.get_children())
 
     def iniciarVenta(self):
-        self.idTicket = self.controlador.iniciarVenta(self.campoCliente.get())
-        self.etiquetaMostrarCliente.config(text="Cliente: "+self.campoCliente.get())
-        self.etiquetaIdVenta.config(text="Venta: "+str(self.idTicket))
-        
-        self.indiceBarbero = self.comboBarbero.current() + 1
-        #print(f"el Id del barbero es {self.indiceBarbero}")
-        self.etiquetaMostrarBarbero.config(text="Barbero: "+self.comboBarbero.get())
+        validado = self.validarCampos()
+        if(validado):
+            self.idTicket = self.controlador.iniciarVenta(self.campoCliente.get())
+            self.etiquetaMostrarCliente.config(text="Cliente: "+self.campoCliente.get())
+            self.etiquetaIdVenta.config(text="Venta: "+str(self.idTicket))
+            self.botonEliminarItem.config(state="normal")
+            self.botonFinalizarV.config(state="normal")
+            self.botonAgregarProducto.config(state="normal")
+            self.botonAgregarServicio.config(state="normal")
+            
+            self.indiceBarbero = self.comboBarbero.current() + 1
+            #print(f"el Id del barbero es {self.indiceBarbero}")
+            self.etiquetaMostrarBarbero.config(text="Barbero: "+self.comboBarbero.get())
 
-        self.subtotal = 0
+            self.subtotal = 0
 
-        self.botonIniciarVenta.config(state= "disabled")
-        tk.messagebox.showinfo("Nueva venta", "Has iniciado una nueva venta.")
+            self.botonIniciarVenta.config(state= "disabled")
+            tk.messagebox.showinfo("Nueva venta", "Has iniciado una nueva venta.")
+        else:
+            tk.messagebox.showinfo("Error", "Llena correctamente los campos")
 
     def llenarBarberos(self):
         tuplaBarberos = self.controlador.obtenerBarberos()
@@ -308,14 +316,23 @@ class VentasFrame(tk.Frame):
         self.etiquetaPTotal.config(text="$ "+str(self.totalVenta))
 
     def finalizarVenta(self):
-        datosFaltantes = (self.totalVenta, self.comboMetodoPago.get(), self.descuento, self.subtotal, self.idTicket)
-        print(datosFaltantes)
-        self.controlador.finalizarVenta(datosFaltantes)
+        if(self.comboMetodoPago.get() != ""):
+            datosFaltantes = (self.totalVenta, self.comboMetodoPago.get(), self.descuento, self.subtotal, self.idTicket)
+            print(datosFaltantes)
+            self.controlador.finalizarVenta(datosFaltantes)
 
-        self.subtotal = 0
-        self.limpiarWidgets()
+            self.subtotal = 0
+            self.limpiarWidgets()
 
-        tk.messagebox.showinfo("Venta finalizada", "Venta concluida correctamente")
+            self.botonEliminarItem.config(state="disabled")
+            self.botonAgregarServicio.config(state="disabled")
+            self.botonAgregarProducto.config(state="disabled")
+            self.botonFinalizarV.config(state="disabled")
+
+            tk.messagebox.showinfo("Venta finalizada", "Venta concluida correctamente")
+            
+        else: 
+            tk.messagebox.showinfo("Error", "Seleccione un método de pago")
         
 
     def limpiarWidgets(self):
@@ -330,3 +347,27 @@ class VentasFrame(tk.Frame):
         self.etiquetaPTotal.config(text="$ 0.00")
         self.campoDescuento.delete(0, END)
         self.comboMetodoPago.set("")
+
+    def validarCampos(self):
+        validado = True
+        if(self.campoCliente.get().isnumeric() == False):
+            validado = False
+
+        if(self.comboBarbero.get() == ""):
+            validado = False
+        
+        return validado
+    
+    def eliminarItem(self):
+        
+        seleccion = self.tablaResumenVenta.selection()
+
+        if seleccion:
+            filaSeleccionada = self.tablaResumenVenta.selection()[0]
+            valores = self.tablaResumenVenta.item(seleccion, "values")
+            self.subtotal -= int (valores[3])
+            self.etiquetaPSubtotal.config(text=str("$ "+str(self.subtotal)))
+            self.tablaResumenVenta.delete(filaSeleccionada)
+        
+        else:
+            tk.messagebox.showinfo("Error al eliminar", "Primero selecciona un item")
