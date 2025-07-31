@@ -1,7 +1,4 @@
 #TODO List
 
 
-Ventana de clientes:
--Restriccion a numero de telefono, nombre, telefono
--Agregar formato de fecha de nacimiento
--Restriccion de agregar id en inserción
+Sistema en general: Modificar las tablas de la BD para que user y password esten en la tabla empleado y evitar renduncandia.

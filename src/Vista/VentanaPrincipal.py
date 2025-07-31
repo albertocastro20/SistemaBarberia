@@ -26,10 +26,11 @@ import datetime
 
 class BarberiaPrincipal(tk.Frame):
 
-    def __init__(self, parent, controlador_recibido):
+    def __init__(self, parent, controlador_recibido, sesion):
         super().__init__(parent)
         self.parent = parent
         self.controlador_recibido = controlador_recibido
+        self.sesion = sesion
         self.parent.title("Barberia")
         self.parent.geometry("900x600")
         self.parent.config(bg="#1A1A1A") # Fondo oscuro para un look moderno
@@ -137,6 +138,11 @@ class BarberiaPrincipal(tk.Frame):
         self.botonVentas = create_sidebar_button(self.frameBotones, "  VENTAS", lambda: activate_button(self.botonVentas, "Ventas"), 5)
 
         self.botonInventario.config(state= "disabled")
+
+        #Desahibilta los botones dependiendo el usuario que inicio la sesión
+        if (self.sesion !=2):
+            self.botonServicios.config(state="disabled")
+            self.botonBarberos.config(state="disabled")
 
 
 

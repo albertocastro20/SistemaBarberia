@@ -1,20 +1,24 @@
 #from ..Modelo.Conexion import *
 from Vista.VentanaPrincipal import BarberiaPrincipal
+from Vista.Login import LoginWindow
 import tkinter as tk
 from Modelo.Conexion import *
 from Modelo.ManejoClientes import *
 from Modelo.ManejoCitas import *
 from Modelo.Clases import *
 from Modelo.ManejoVentas import QuerysVentas
+from Modelo.ManejoLogin import ManejoIniciarSesion
 
 class Controlador:
     def __init__(self, parent):
         self.parent = parent
-        self.vista =  BarberiaPrincipal(parent = self.parent, controlador_recibido= self) #Se pasa root y asi mismo como controlador
+        self.vista = LoginWindow(root, self)
+        #self.vista =  BarberiaPrincipal(parent = self.parent, controlador_recibido= self) #Se pasa root y asi mismo como controlador
         self.conexion = Conexion("root", "Cris8426")
         self.manejoClientes = QuerysCliente(self.conexion)
         self.manejoVentas = QuerysVentas(self.conexion) 
         self.manejoCitas = QuerysCita(self.conexion)
+        self.manejoLogin = ManejoIniciarSesion(self.conexion)
         
 # --------------------------- Querys Cliente -----------------------------------
     def insercionCliente(self, cliente):
@@ -80,6 +84,11 @@ class Controlador:
 
     def finalizarVenta(self, datosFaltantes):
         self.manejoVentas.actualizarVenta(datosFaltantes)
+
+    #------------------Login----------------------------
+    def comprobarLogueo(self, usuario, contra):
+        logeuado = self.manejoLogin.verificar_credenciales(usuario, contra)
+        return logeuado
         
 
 if __name__ == "__main__":
