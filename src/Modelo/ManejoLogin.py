@@ -5,6 +5,59 @@ class ManejoIniciarSesion():
     def __init__(self, conexion):
         self.conexion = conexion
 
+    def registrarBarbero(self, barbero):
+        
+        #Se recibe un cliente y se contruye una cadena que será el query que usaremos
+        qInsertarEmpleadoBarbero = """
+        INSERT INTO Empleado (nombre, apellido_paterno, apellido_materno, fecha_nacimiento, telefono, direccion, fecha_contratacion, estatus, idPrivilegio)
+        values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        #En esta tupla acomodamos los valores recibidos y que queremos insertar
+        tuplaBarbero = (barbero.nombre, barbero.apellido, barbero.apellidoMaterno, barbero.fechaNacimiento, barbero.telefono, 
+                        barbero.direccion, barbero.fechaContratacion, barbero.estatus, barbero.privilegios)
+
+        cone = self.conexion.conectar()
+
+        if cone:
+            try:
+                cursor = cone.cursor()
+                cursor.execute(qInsertarEmpleadoBarbero, tuplaBarbero)
+                cone.commit()
+                print("Registro exitoso")
+                
+            
+            except Error as e:
+                print(f"Error: {e}")
+
+    def registrarUsuario(self, empleado):
+        #Se recibe un cliente y se contruye una cadena que será el query que usaremos
+        qInsertarEmpleadoBarbero = """
+        INSERT INTO Empleado (nombre, apellido_paterno, apellido_materno, fecha_nacimiento, telefono, direccion, fecha_contratacion, estatus, idPrivilegio, usuario, password)
+        values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        contra = empleado.contra
+        hashed_password = bcrypt.hashpw(contra.encode('utf-8'), bcrypt.gensalt())
+
+        #En esta tupla acomodamos los valores recibidos y que queremos insertar
+        tuplaEmpleado = (empleado.nombre, empleado.apellido, empleado.apellidoMaterno, empleado.fechaNacimiento, empleado.telefono, 
+                        empleado.direccion, empleado.fechaContratacion, empleado.estatus, empleado.privilegios, 
+                        empleado.usuario, hashed_password.decode('utf-8'))
+
+        cone = self.conexion.conectar()
+
+        if cone:
+            try:
+                cursor = cone.cursor()
+                cursor.execute(qInsertarEmpleadoBarbero, tuplaEmpleado)
+                cone.commit()
+                print("Registro exitoso")
+                
+            
+            except Error as e:
+                print(f"Error: {e}")
+
+    
     def registrar_usuario(self, username, password):
         cone = self.conexion.conectar()
         if cone:
@@ -13,7 +66,7 @@ class ManejoIniciarSesion():
                 # Generar el hash de la contraseña
                 hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-                sql = "INSERT INTO usuarios (username, password_hash, email, rol) VALUES (%s, %s, %s, %s)"
+                sql = "INSERT INTO usuarios (nombre, username, password_hash, email, rol) VALUES (%s, %s, %s, %s)"
                 cursor.execute(sql, (username, hashed_password.decode('utf-8')))
                 cone.commit()
                 return True
@@ -39,16 +92,15 @@ class ManejoIniciarSesion():
                         
                     else:
                         print("Contraseña incorrecta.")
+                        logueado = [False , None]
                         
                 else:
                     print("Usuario no encontrado o inactivo.")
+                    logueado = [False , None]
                     
             except Error as err:
                 print(f"Error al verificar credenciales: {err}")
                 
-
-        print("Si llega")
-        print(logueado)
         return logueado
             
 

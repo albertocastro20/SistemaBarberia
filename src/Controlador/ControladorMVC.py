@@ -14,7 +14,7 @@ class Controlador:
         self.parent = parent
         self.vista = LoginWindow(root, self)
         #self.vista =  BarberiaPrincipal(parent = self.parent, controlador_recibido= self) #Se pasa root y asi mismo como controlador
-        self.conexion = Conexion("root", "Cris8426")
+        self.conexion = Conexion("root", "Cris8426") #Aqui se cambian los valores de usuario y contraseña dependiendo de los que sean de su BD creada
         self.manejoClientes = QuerysCliente(self.conexion)
         self.manejoVentas = QuerysVentas(self.conexion) 
         self.manejoCitas = QuerysCita(self.conexion)
@@ -89,13 +89,19 @@ class Controlador:
     def comprobarLogueo(self, usuario, contra):
         logeuado = self.manejoLogin.verificar_credenciales(usuario, contra)
         return logeuado
+    
+    def registrarBarbero(self, barbero):
+        self.manejoLogin.registrarBarbero(barbero)
+
+    def registrarUsuario(self, empleado):
+        self.manejoLogin.registrarUsuario(empleado)
         
 
 if __name__ == "__main__":
     root = tk.Tk()
     control = Controlador(root)
 
-    root.resizable(False, False)
+    #root.resizable(False, False)
     root.mainloop()
     
     

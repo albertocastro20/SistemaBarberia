@@ -15,19 +15,21 @@ class Cliente(Persona):
         self.numeroVisitas = numeroVisitas
 
 class Empleado(Persona):
-    def __init__(self, id, nombre, apellido, telefono, fechaNacimiento, apellidoMaterno, direccion, fechaContratacion, estatus, privilegios):
-        super().__init__(id, nombre, apellido, telefono, fechaNacimiento)
+    def __init__(self, id, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, direccion, fechaContratacion, estatus, idPrivilegio, usuario, contra):
+        super().__init__(id, nombre, apellidoPaterno, telefono, fechaNacimiento)
         self.apellidoMaterno = apellidoMaterno
         self.direccion = direccion
         self.fechaContratacion = fechaContratacion
         self.estatus = estatus
-        self.privilegios = privilegios
+        self.privilegios = idPrivilegio
+        self.usuario = usuario
+        self.contra = contra
 
 class Barbero(Empleado):
     def __init__(self, id, nombre, apellido, telefono, fechaNacimiento, apellidoMaterno, direccion, 
-                 fechaContratacion, estatus, privilegios, especialidad, calificacion, idBarbero):
+                 fechaContratacion, estatus, privilegios, usuario, contra, especialidad, calificacion, idBarbero):
         super().__init__(id, nombre, apellido, telefono, fechaNacimiento, apellidoMaterno, direccion,
-                          fechaContratacion, estatus, privilegios)
+                          fechaContratacion, estatus, privilegios, usuario, contra)
         self.especialidad = especialidad
         self.calificacion = calificacion
         self.idBarbero = idBarbero

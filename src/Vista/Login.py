@@ -92,15 +92,6 @@ class LoginWindow:
 
         # Título del Login
         ttk.Label(self.login_frame, text="Iniciar Sesión", style='LoginHeader.TLabel').pack(pady=(10, 20))
-
-        # Combobox para Tipo de Usuario
-        ttk.Label(self.login_frame, text="Tipo de Usuario:", style='Login.TLabel').pack(anchor="w", padx=50)
-        self.tipoUsuario = ttk.Combobox(self.login_frame, 
-                                               values=["Dueño", "Recepcionista"], 
-                                               state="readonly", # No permitir escribir
-                                               style='Login.TCombobox')
-        self.tipoUsuario.pack(pady=5, padx=50, fill="x")
-        self.tipoUsuario.set("Dueño") # Valor por defecto
         
         # Campo de Usuario
         ttk.Label(self.login_frame, text="Usuario:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(10, 0))
@@ -120,9 +111,10 @@ class LoginWindow:
         username = self.campoUser.get()
         password = self.campoContraseña.get()
         listaRecibida = self.controlador.comprobarLogueo(username, password)
+        
 
         # Lógica de autenticación de prueba
-        print(f"u: {username} y p: {password}")
+        
         if listaRecibida[0]:
             self.master.destroy()
             if listaRecibida[1] == 2:
@@ -140,6 +132,8 @@ class LoginWindow:
         main_root = tk.Tk()
         app = BarberiaPrincipal(main_root, self.controlador, sesion)
         main_root.mainloop()
+
+        
 
 # --- Punto de entrada de la aplicación ---
 

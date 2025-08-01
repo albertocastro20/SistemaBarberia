@@ -15,6 +15,7 @@ from Vista.VistaCitas import CitasFrame
 from Vista.VistaClientes import ClientesFrame
 from Vista.VistaServicios import ServiciosFrame
 from Vista.VentanaVentas import VentasFrame
+from Vista.RegistrarUsuario import VRegistrarUsuario
 
 #Librerias del Controlador
 #from Controlador.ControladorMVC import *
@@ -34,6 +35,8 @@ class BarberiaPrincipal(tk.Frame):
         self.parent.title("Barberia")
         self.parent.geometry("900x600")
         self.parent.config(bg="#1A1A1A") # Fondo oscuro para un look moderno
+        self.parent.resizable(False, False)
+        #self.master.eval('tk::PlaceWindow . center')
 
         self.framesSeccion = {}
         self.active_button = None
@@ -155,21 +158,31 @@ class BarberiaPrincipal(tk.Frame):
         menuArchivo = Menu(barraMenuP,  tearoff=0, bg="#333333", fg="#FFFFFF", 
                          activebackground="#555555", activeforeground="#FFFFFF")
         menuArchivo.add_command(label= "Establecer conexion", command= lambda: self.conexion.conectar())
-        menuArchivo.add_command(label= "Iniciar Sesion")
+        
+        if (self.sesion == 2):
+            menuArchivo.add_command(label= "Registrar Usuario", command= lambda:self.abrirRegistrarUsuario())
+
         menuArchivo.add_command(label= "Cambiar de usuario")
         menuArchivo.add_command(label= "Cerrar Sesion")
         menuArchivo.add_command(label= "Salir de la Aplicación", command= lambda: self.parent.destroy())
         barraMenuP.add_cascade(label="Inicio", menu=menuArchivo)
 
 
-        menuVentanas = Menu(barraMenuP, tearoff=0)
+        """menuVentanas = Menu(barraMenuP, tearoff=0)
         menuVentanas.add_command(label= "Ventana Principal")
         menuVentanas.add_command(label= "Gestion de citas")
         menuVentanas.add_command(label= "Productos")
         menuVentanas.add_command(label= "Clientes")
         menuVentanas.add_command(label= "Servicios")
         menuVentanas.add_command(label= "Barberos")
-        barraMenuP.add_cascade(label="Navegación", menu=menuVentanas)
+        barraMenuP.add_cascade(label="Navegación", menu=menuVentanas)"""
 
 
         self.parent.config(menu=barraMenuP)
+
+    def abrirRegistrarUsuario(self):
+        # Crea la ventana principal de la aplicación        
+        self.master.destroy()
+        main_root = tk.Tk()
+        app = VRegistrarUsuario(main_root, self.controlador_recibido)
+        main_root.mainloop()
