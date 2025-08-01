@@ -4,14 +4,18 @@ from tkinter import ttk, messagebox
 from Modelo.Clases import Empleado
 import datetime
 
-class VRegistrarUsuario:
+class VRegistrarUsuario(tk.Frame):
     def __init__(self, master, controlador):
+            super().__init__(master)
+            self.pack(fill="both", expand=True)
             self.master = master
             self.controlador =  controlador
             self.master.title("Registrar Usuario")
-            self.master.geometry("450x640") # Aumentamos un poco el tamaño para el combobox
+            self.master.geometry("450x650") # Aumentamos un poco el tamaño para el combobox
             #self.master.resizable(False, False)
             self.master.eval('tk::PlaceWindow . center')
+
+            self.iniciarBarraMenu()
 
             # --- Estilos personalizados para el Login (basados en tu ejemplo) ---
             self.style = ttk.Style()
@@ -89,15 +93,15 @@ class VRegistrarUsuario:
 
 
             # --- Contenedor del Login ---
-            self.login_frame = ttk.Frame(master, style='Login.TFrame') # Aplicamos el estilo al frame
-            self.login_frame.pack(expand=True, fill="both", padx=10, pady=10) # Añadimos padding al frame
+            self.config(bg="#333333")
+            self.pack(expand=True, fill="both", padx=20, pady=20)  # Coloca este frame en root
 
             # Título del Login
-            ttk.Label(self.login_frame, text="Registrar Usuario", style='LoginHeader.TLabel').pack(pady=(10, 10))
+            ttk.Label(self, text="Registrar Usuario", style='LoginHeader.TLabel').pack(pady=(10, 10))
 
             #Tipo de usuario
-            ttk.Label(self.login_frame, text="Tipo de Usuario:", style='Login.TLabel').pack(anchor="w", padx=50)
-            self.tipoUsuario = ttk.Combobox(self.login_frame, 
+            ttk.Label(self, text="Tipo de Usuario:", style='Login.TLabel').pack(anchor="w", padx=50)
+            self.tipoUsuario = ttk.Combobox(self, 
                                                 values=["Dueño", "Recepcionista", "Barbero"], 
                                                 state="readonly", # No permitir escribir
                                                 style='Login.TCombobox')
@@ -107,47 +111,65 @@ class VRegistrarUsuario:
             self.tipoUsuario.bind("<<ComboboxSelected>>", self.seleccionCombo)
             
             # Campo de Nombre
-            ttk.Label(self.login_frame, text="Nombre:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
-            self.campoNombre = ttk.Entry(self.login_frame, style='Login.TEntry')
+            ttk.Label(self, text="Nombre:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
+            self.campoNombre = ttk.Entry(self, style='Login.TEntry')
             self.campoNombre.pack(pady=5, padx=50, fill="x")
 
             # Campo de apellido Paterno
-            ttk.Label(self.login_frame, text="Apellido Paterno: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
-            self.campoApellidoP = ttk.Entry(self.login_frame, style='Login.TEntry')
+            ttk.Label(self, text="Apellido Paterno: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
+            self.campoApellidoP = ttk.Entry(self, style='Login.TEntry')
             self.campoApellidoP.pack(pady=5, padx=50, fill="x")
 
             # Campo de apellido Materno
-            ttk.Label(self.login_frame, text="Apellido Materno: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
-            self.campoApellidoM = ttk.Entry(self.login_frame, style='Login.TEntry')
+            ttk.Label(self, text="Apellido Materno: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
+            self.campoApellidoM = ttk.Entry(self, style='Login.TEntry')
             self.campoApellidoM.pack(pady=5, padx=50, fill="x")
 
             # Campo de Fecha de Nacimiento
-            ttk.Label(self.login_frame, text="Fecha de Nacimiento: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
-            self.campoFechaN = ttk.Entry(self.login_frame, style='Login.TEntry')
+            ttk.Label(self, text="Fecha de Nacimiento: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
+            self.campoFechaN = ttk.Entry(self, style='Login.TEntry')
             self.campoFechaN.pack(pady=5, padx=50, fill="x")
 
             # Campo de Telefono
-            ttk.Label(self.login_frame, text="Telefono: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
-            self.campoTelefono = ttk.Entry(self.login_frame, style='Login.TEntry')
+            ttk.Label(self, text="Telefono: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
+            self.campoTelefono = ttk.Entry(self, style='Login.TEntry')
             self.campoTelefono.pack(pady=5, padx=50, fill="x")
 
             # Campo de Dirección
-            ttk.Label(self.login_frame, text="Direccion: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
-            self.campoDireccion = ttk.Entry(self.login_frame, style='Login.TEntry')
+            ttk.Label(self, text="Direccion: ", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
+            self.campoDireccion = ttk.Entry(self, style='Login.TEntry')
             self.campoDireccion.pack(pady=5, padx=50, fill="x")
             
             # Campo de Usuario
-            ttk.Label(self.login_frame, text="Usuario:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
-            self.campoUser = ttk.Entry(self.login_frame, style='Login.TEntry')
+            ttk.Label(self, text="Usuario:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
+            self.campoUser = ttk.Entry(self, style='Login.TEntry')
             self.campoUser.pack(pady=5, padx=50, fill="x")
 
             # Campo de Contraseña
-            ttk.Label(self.login_frame, text="Contraseña:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
-            self.campoContraseña = ttk.Entry(self.login_frame, show="*", style='Login.TEntry')
+            ttk.Label(self, text="Contraseña:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(5, 0))
+            self.campoContraseña = ttk.Entry(self, show="*", style='Login.TEntry')
             self.campoContraseña.pack(pady=5, padx=50, fill="x")
 
             # Botón de Iniciar Sesión
-            ttk.Button(self.login_frame, text="Registrar Usuario",style='LoginButton.TButton', command=lambda: self.registrarBarbero()).pack(pady=10)#
+            ttk.Button(self, text="Registrar Usuario",style='LoginButton.TButton', command=lambda: self.registrarBarbero()).pack(pady=10)#
+
+            
+    def iniciarBarraMenu(self):
+        barraMenuP = Menu(self.master, bg="#34495E", fg="#ECF0F1", 
+                    activebackground="#4E6D8F", activeforeground="#FFFFFF",
+                    font=("Segoe UI", 10))
+    
+        self.master.config(menu= barraMenuP)
+        menuArchivo = Menu(barraMenuP,  tearoff=0, bg="#333333", fg="#FFFFFF", 
+                            activebackground="#555555", activeforeground="#FFFFFF")
+        menuArchivo.add_command(label= "Menu Principal", command= lambda: self.cambiarVentana())
+
+        barraMenuP.add_cascade(label="Opciones", menu=menuArchivo)
+
+
+    def cambiarVentana(self):
+        self.controlador.mostrar_principal(2)
+
 
     def seleccionCombo(self, event):
           tipoSeleccionado = self.tipoUsuario.get()
@@ -192,12 +214,6 @@ class VRegistrarUsuario:
         
         
         return empleado
-
-    def obtenerDatosUsuario(self):
-         pass
-    
-    def registrarUsuarioCompleto(self):
-         pass
     
     def registrarBarbero(self):
         

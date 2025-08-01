@@ -1,17 +1,22 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkcalendar import Calendar 
+from tkinter import * 
+
 import datetime
 from Vista.VentanaPrincipal import BarberiaPrincipal
 
-class LoginWindow:
+class LoginWindow(tk.Frame):
     def __init__(self, master, controlador):
-        self.master = master
+        super().__init__(master)
+        self.pack(fill="both", expand=True)
         self.controlador =  controlador
         self.master.title("Iniciar Sesión - Barbería")
         self.master.geometry("400x400") # Aumentamos un poco el tamaño para el combobox
         self.master.resizable(False, False)
         self.master.eval('tk::PlaceWindow . center')
+
+        self.iniciarBarraMenu()
 
         # --- Estilos personalizados para el Login (basados en tu ejemplo) ---
         self.style = ttk.Style()
@@ -87,24 +92,29 @@ class LoginWindow:
 
 
         # --- Contenedor del Login ---
-        self.login_frame = ttk.Frame(master, style='Login.TFrame') # Aplicamos el estilo al frame
-        self.login_frame.pack(expand=True, fill="both", padx=20, pady=20) # Añadimos padding al frame
+        #self = ttk.Frame(master, style='Login.TFrame') # Aplicamos el estilo al frame
+        #self.login_frame.pack(expand=True, fill="both", padx=20, pady=20) # Añadimos padding al frame
+
+        self.config(bg="#333333")
+        self.pack(expand=True, fill="both", padx=20, pady=20)  # Coloca este frame en root
+
+                       
 
         # Título del Login
-        ttk.Label(self.login_frame, text="Iniciar Sesión", style='LoginHeader.TLabel').pack(pady=(10, 20))
+        ttk.Label(self, text="Iniciar Sesión", style='LoginHeader.TLabel').pack(pady=(10, 20))
         
         # Campo de Usuario
-        ttk.Label(self.login_frame, text="Usuario:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(10, 0))
-        self.campoUser = ttk.Entry(self.login_frame, style='Login.TEntry')
+        ttk.Label(self, text="Usuario:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(10, 0))
+        self.campoUser = ttk.Entry(self, style='Login.TEntry')
         self.campoUser.pack(pady=5, padx=50, fill="x")
 
         # Campo de Contraseña
-        ttk.Label(self.login_frame, text="Contraseña:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(10, 0))
-        self.campoContraseña = ttk.Entry(self.login_frame, show="*", style='Login.TEntry')
+        ttk.Label(self, text="Contraseña:", style='Login.TLabel').pack(anchor="w", padx=50, pady=(10, 0))
+        self.campoContraseña = ttk.Entry(self, show="*", style='Login.TEntry')
         self.campoContraseña.pack(pady=5, padx=50, fill="x")
 
         # Botón de Iniciar Sesión
-        ttk.Button(self.login_frame, text="Iniciar Sesión", command=self.check_login, style='LoginButton.TButton').pack(pady=20)
+        ttk.Button(self, text="Iniciar Sesión", command=self.check_login, style='LoginButton.TButton').pack(pady=20)
 
     def check_login(self):
         
@@ -116,22 +126,32 @@ class LoginWindow:
         # Lógica de autenticación de prueba
         
         if listaRecibida[0]:
-            self.master.destroy()
+            #self.master.destroy()
             if listaRecibida[1] == 2:
                 messagebox.showinfo("Éxito", "Sesión de Dueño iniciada correctamente!")
             else:
                 messagebox.showinfo("Éxito", "Iniciaste sesión como Recepcionista!")
 
-            self.open_main_app(listaRecibida[1]) # Llama a la función que abre la app principal
+            #self.open_main_app(listaRecibida[1]) # Llama a la función que abre la app principal
+            self.controlador.mostrar_principal(listaRecibida[1])
+
 
         else:
             messagebox.showerror("Error de Login", "Credenciales incorrectas o tipo de usuario no válido.")
 
-    def open_main_app(self, sesion):
-        # Crea la ventana principal de la aplicación        
-        main_root = tk.Tk()
-        app = BarberiaPrincipal(main_root, self.controlador, sesion)
-        main_root.mainloop()
+    def iniciarBarraMenu(self):
+        barraMenuP = Menu(self.master, bg="#34495E", fg="#ECF0F1", 
+                    activebackground="#4E6D8F", activeforeground="#FFFFFF",
+                    font=("Segoe UI", 10))
+    
+        self.master.config(menu= barraMenuP)
+        menuArchivo = Menu(barraMenuP,  tearoff=0, bg="#333333", fg="#FFFFFF", 
+                            activebackground="#555555", activeforeground="#FFFFFF")
+        menuArchivo.add_command(label= "Salir de la Aplicación", command= lambda: self.parent.destroy())
+
+        barraMenuP.add_cascade(label="Opciones", menu=menuArchivo)
+        
+        
 
         
 

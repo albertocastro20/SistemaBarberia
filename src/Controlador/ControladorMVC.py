@@ -1,6 +1,7 @@
 #from ..Modelo.Conexion import *
 from Vista.VentanaPrincipal import BarberiaPrincipal
 from Vista.Login import LoginWindow
+from Vista.RegistrarUsuario import VRegistrarUsuario
 import tkinter as tk
 from Modelo.Conexion import *
 from Modelo.ManejoClientes import *
@@ -11,14 +12,33 @@ from Modelo.ManejoLogin import ManejoIniciarSesion
 
 class Controlador:
     def __init__(self, parent):
-        self.parent = parent
-        self.vista = LoginWindow(root, self)
+        self.root = parent
+
+        self.ventana_actual = None
+        #self.vista = LoginWindow(root, self)
         #self.vista =  BarberiaPrincipal(parent = self.parent, controlador_recibido= self) #Se pasa root y asi mismo como controlador
         self.conexion = Conexion("root", "Cris8426") #Aqui se cambian los valores de usuario y contraseña dependiendo de los que sean de su BD creada
         self.manejoClientes = QuerysCliente(self.conexion)
         self.manejoVentas = QuerysVentas(self.conexion) 
         self.manejoCitas = QuerysCita(self.conexion)
         self.manejoLogin = ManejoIniciarSesion(self.conexion)
+        self.mostrar_login()
+
+    #------------------Manejo de ventanas------------------------
+    def mostrar_login(self):
+        if self.ventana_actual:
+            self.ventana_actual.destroy()
+        self.ventana_actual = LoginWindow(self.root, self)
+
+    def mostrar_principal(self, sesion):
+        if self.ventana_actual:
+            self.ventana_actual.destroy()
+        self.ventana_actual = BarberiaPrincipal(self.root, self, sesion)
+
+    def mostrar_registrarUsuario(self):
+        if self.ventana_actual:
+            self.ventana_actual.destroy()
+        self.ventana_actual = VRegistrarUsuario(self.root, self)
         
 # --------------------------- Querys Cliente -----------------------------------
     def insercionCliente(self, cliente):

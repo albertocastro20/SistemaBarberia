@@ -29,12 +29,14 @@ class BarberiaPrincipal(tk.Frame):
 
     def __init__(self, parent, controlador_recibido, sesion):
         super().__init__(parent)
+        self.pack(fill="both", expand=True)
+        self.config(bg="#1A1A1A")
         self.parent = parent
         self.controlador_recibido = controlador_recibido
         self.sesion = sesion
         self.parent.title("Barberia")
-        self.parent.geometry("900x600")
-        self.parent.config(bg="#1A1A1A") # Fondo oscuro para un look moderno
+        self.parent.geometry("900x620")
+        self.parent.config(bg="#333333") # Fondo oscuro para un look moderno
         self.parent.resizable(False, False)
         #self.master.eval('tk::PlaceWindow . center')
 
@@ -58,7 +60,7 @@ class BarberiaPrincipal(tk.Frame):
     def iniciarFrames(self):
         #vamos a cambiar la interfaz gráfica
         
-        self.frameTitulo = Frame(self.parent, width=850, height=100, bg="#333333", highlightbackground="#555555", highlightthickness=1) # Fondo oscuro y borde sutil
+        self.frameTitulo = Frame(self, width=850, height=100, bg="#333333", highlightbackground="#555555", highlightthickness=1) # Fondo oscuro y borde sutil
         self.frameTitulo.grid(row=0, column=0, padx=25, pady=10, columnspan=2)
         self.frameTitulo.grid_propagate(False)
         #Se asigna la etiqueta al Frame
@@ -66,11 +68,11 @@ class BarberiaPrincipal(tk.Frame):
         titulo.config(font=("Segoe UI", 28, "bold")) # Fuente moderna y negrita
         titulo.grid(row=0, column=0, padx=240, pady=20)
         
-        self.frameBotones = Frame(self.parent, width=150, height=460, bg="#2C2C2C", highlightbackground="#555555", highlightthickness=1) # Fondo más oscuro y borde sutil
+        self.frameBotones = Frame(self, width=150, height=460, bg="#2C2C2C", highlightbackground="#555555", highlightthickness=1) # Fondo más oscuro y borde sutil
         self.frameBotones.grid(row=1, column=0, padx=10, pady=10)
         self.frameBotones.grid_propagate(False)
 
-        self.framePrincipal = Frame(self.parent, width=650, height=460, bg="#000000", highlightbackground="#000000", highlightthickness=1) # Fondo claro para el contenido principal
+        self.framePrincipal = Frame(self, width=650, height=460, bg="#000000", highlightbackground="#000000", highlightthickness=1) # Fondo claro para el contenido principal
         self.framePrincipal.grid(row=1, column=1, padx=10, pady=10)
         self.framePrincipal.grid_propagate(False)
 
@@ -157,15 +159,15 @@ class BarberiaPrincipal(tk.Frame):
         self.parent.config(menu= barraMenuP)
         menuArchivo = Menu(barraMenuP,  tearoff=0, bg="#333333", fg="#FFFFFF", 
                          activebackground="#555555", activeforeground="#FFFFFF")
-        menuArchivo.add_command(label= "Establecer conexion", command= lambda: self.conexion.conectar())
+        #menuArchivo.add_command(label= "Establecer conexion", command= lambda: self.conexion.conectar())
         
         if (self.sesion == 2):
             menuArchivo.add_command(label= "Registrar Usuario", command= lambda:self.abrirRegistrarUsuario())
 
-        menuArchivo.add_command(label= "Cambiar de usuario")
-        menuArchivo.add_command(label= "Cerrar Sesion")
+        #menuArchivo.add_command(label= "Cambiar de usuario")
+        menuArchivo.add_command(label= "Cerrar Sesion", command= lambda: self.cerrarSesion())
         menuArchivo.add_command(label= "Salir de la Aplicación", command= lambda: self.parent.destroy())
-        barraMenuP.add_cascade(label="Inicio", menu=menuArchivo)
+        barraMenuP.add_cascade(label="Opciones", menu=menuArchivo)
 
 
         """menuVentanas = Menu(barraMenuP, tearoff=0)
@@ -181,8 +183,7 @@ class BarberiaPrincipal(tk.Frame):
         self.parent.config(menu=barraMenuP)
 
     def abrirRegistrarUsuario(self):
-        # Crea la ventana principal de la aplicación        
-        self.master.destroy()
-        main_root = tk.Tk()
-        app = VRegistrarUsuario(main_root, self.controlador_recibido)
-        main_root.mainloop()
+        self.controlador_recibido.mostrar_registrarUsuario()
+
+    def cerrarSesion(self):
+        self.controlador_recibido.mostrar_login()
